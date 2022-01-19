@@ -21,19 +21,16 @@ import 'package:google_maps_webservice/places.dart' as places;
 import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:give_structure/src/api/environment.dart';
 
-class ClientMapController{
+class ClientMapController {
   BuildContext context;
   Function refresh;
   GlobalKey<ScaffoldState> key = new GlobalKey<ScaffoldState>();
   Completer<GoogleMapController> _mapController = Completer();
 
-
   CameraPosition initialPosition = CameraPosition(
-      target: LatLng(-25.45115884604181, -57.43336174636765),
-      zoom: 14.0
-  );
+      target: LatLng(-25.45115884604181, -57.43336174636765), zoom: 14.0);
 
-  Map<MarkerId, Marker> markers = <MarkerId, Marker> {};
+  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
 
   Position _position;
   StreamSubscription<Position> _positionStream;
@@ -62,7 +59,8 @@ class ClientMapController{
 
   bool isFromSelected = true;
 
-  places.GoogleMapsPlaces _places = places.GoogleMapsPlaces(apiKey: Environment.API_KEY_MAPS);
+  places.GoogleMapsPlaces _places =
+      places.GoogleMapsPlaces(apiKey: Environment.API_KEY_MAPS);
 
   Future init(BuildContext context, Function refresh) async {
     this.context = context;
@@ -71,27 +69,29 @@ class ClientMapController{
     _authProvider = new AuthProvider();
     _driverProvider = new DriverProvider();
     _clientProvider = new ClientProvider();
-    _progressDialog = MyProgressDialog.createProgressDialog(context, 'Conectándose...');
+    _progressDialog =
+        MyProgressDialog.createProgressDialog(context, 'Conectándose...');
     markerDriver = await createMarkerImageFromAsset('assets/img/icon_taxi.png');
     checkGPS();
     getClientInfo();
   }
 
-  void getClientInfo(){
-    Stream<DocumentSnapshot> clientStream = _clientProvider.getByIdStream(_authProvider.getUser().uid);
+  void getClientInfo() {
+    Stream<DocumentSnapshot> clientStream =
+        _clientProvider.getByIdStream(_authProvider.getUser().uid);
     _clientInfoSubscription = clientStream.listen((DocumentSnapshot document) {
       client = Client.fromJson(document.data());
       refresh();
     });
   }
 
-  void dispose(){
+  void dispose() {
     _positionStream?.cancel();
     _statusSubscription?.cancel();
     _clientInfoSubscription?.cancel();
   }
 
-  void openDrawer(){
+  void openDrawer() {
     key.currentState.openDrawer();
   }
 
@@ -100,28 +100,31 @@ class ClientMapController{
     Navigator.pushNamedAndRemoveUntil(context, 'home', (route) => false);
   }
 
-  void onMapCreated(GoogleMapController controller){
-    controller.setMapStyle('[{"elementType":"geometry","stylers":[{"color":"#212121"}]},{"elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},{"elementType":"labels.text.stroke","stylers":[{"color":"#212121"}]},{"featureType":"administrative","elementType":"geometry","stylers":[{"color":"#757575"}]},{"featureType":"administrative.country","elementType":"labels.text.fill","stylers":[{"color":"#9e9e9e"}]},{"featureType":"administrative.land_parcel","stylers":[{"visibility":"off"}]},{"featureType":"administrative.locality","elementType":"labels.text.fill","stylers":[{"color":"#bdbdbd"}]},{"featureType":"poi","elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},{"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#181818"}]},{"featureType":"poi.park","elementType":"labels.text.fill","stylers":[{"color":"#616161"}]},{"featureType":"poi.park","elementType":"labels.text.stroke","stylers":[{"color":"#1b1b1b"}]},{"featureType":"road","elementType":"geometry.fill","stylers":[{"color":"#2c2c2c"}]},{"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#8a8a8a"}]},{"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#373737"}]},{"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#3c3c3c"}]},{"featureType":"road.highway.controlled_access","elementType":"geometry","stylers":[{"color":"#4e4e4e"}]},{"featureType":"road.local","elementType":"labels.text.fill","stylers":[{"color":"#616161"}]},{"featureType":"transit","elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},{"featureType":"water","elementType":"geometry","stylers":[{"color":"#000000"}]},{"featureType":"water","elementType":"labels.text.fill","stylers":[{"color":"#3d3d3d"}]}]');
+  void onMapCreated(GoogleMapController controller) {
+    controller.setMapStyle(
+        '[{"elementType":"geometry","stylers":[{"color":"#212121"}]},{"elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},{"elementType":"labels.text.stroke","stylers":[{"color":"#212121"}]},{"featureType":"administrative","elementType":"geometry","stylers":[{"color":"#757575"}]},{"featureType":"administrative.country","elementType":"labels.text.fill","stylers":[{"color":"#9e9e9e"}]},{"featureType":"administrative.land_parcel","stylers":[{"visibility":"off"}]},{"featureType":"administrative.locality","elementType":"labels.text.fill","stylers":[{"color":"#bdbdbd"}]},{"featureType":"poi","elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},{"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#181818"}]},{"featureType":"poi.park","elementType":"labels.text.fill","stylers":[{"color":"#616161"}]},{"featureType":"poi.park","elementType":"labels.text.stroke","stylers":[{"color":"#1b1b1b"}]},{"featureType":"road","elementType":"geometry.fill","stylers":[{"color":"#2c2c2c"}]},{"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#8a8a8a"}]},{"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#373737"}]},{"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#3c3c3c"}]},{"featureType":"road.highway.controlled_access","elementType":"geometry","stylers":[{"color":"#4e4e4e"}]},{"featureType":"road.local","elementType":"labels.text.fill","stylers":[{"color":"#616161"}]},{"featureType":"transit","elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},{"featureType":"water","elementType":"geometry","stylers":[{"color":"#000000"}]},{"featureType":"water","elementType":"labels.text.fill","stylers":[{"color":"#3d3d3d"}]}]');
     _mapController.complete(controller);
   }
 
   void updateLocation() async {
-    try{
+    try {
       await _determinePosition();
       _position = await Geolocator.getLastKnownPosition();
       centerPosition();
       getNearbyDrivers();
-    } catch(error) {
+    } catch (error) {
       print('Error en la localizacion: $error');
     }
   }
 
-  void changeFromTo(){
+  void changeFromTo() {
     isFromSelected = !isFromSelected;
-    if (isFromSelected){
-      utils.Snackbar.showSnackbar(context, key, 'Estás seleccionando el lugar de recogida ');
+    if (isFromSelected) {
+      utils.Snackbar.showSnackbar(
+          context, key, 'Estás seleccionando el lugar de recogida ');
     } else {
-      utils.Snackbar.showSnackbar(context, key, 'Estás seleccionando el lugar de destino ');
+      utils.Snackbar.showSnackbar(
+          context, key, 'Estás seleccionando el lugar de destino ');
     }
   }
 
@@ -132,21 +135,22 @@ class ClientMapController{
         language: 'es',
         strictbounds: true,
         radius: 5000,
-        location: places.Location(-25.3422228, -57.5141132)
-    );
+        location: places.Location(-25.3422228, -57.5141132));
 
-    if (p != null){
-      places.PlacesDetailsResponse detail = await _places.getDetailsByPlaceId(p.placeId, language: 'es');
+    if (p != null) {
+      places.PlacesDetailsResponse detail =
+          await _places.getDetailsByPlaceId(p.placeId, language: 'es');
       double lat = detail.result.geometry.location.lat;
       double lng = detail.result.geometry.location.lng;
-      List<Address> address = await Geocoder.local.findAddressesFromQuery(p.description);
-      if(address != null){
-        if(address.length > 0){
-          if(detail != null){
+      List<Address> address =
+          await Geocoder.local.findAddressesFromQuery(p.description);
+      if (address != null) {
+        if (address.length > 0) {
+          if (detail != null) {
             String direction = detail.result.name;
             String city = address[0].locality;
             String department = address[0].adminArea;
-            if(isFrom){
+            if (isFrom) {
               from = '$direction, $city, $department';
               fromLatLng = new LatLng(lat, lng);
             } else {
@@ -161,19 +165,19 @@ class ClientMapController{
   }
 
   Future<Null> setLocationDraggableInfo() async {
-    if(_position != null){
+    if (_position != null) {
       double lat = initialPosition.target.latitude;
       double lng = initialPosition.target.longitude;
       List<Placemark> address = await placemarkFromCoordinates(lat, lng);
-      if (address != null){
-        if(address.length > 0){
+      if (address != null) {
+        if (address.length > 0) {
           String direction = address[0].thoroughfare;
           String street = address[0].subThoroughfare;
           String city = address[0].locality;
           String department = address[0].administrativeArea;
           String country = address[0].country;
 
-          if (isFromSelected ) {
+          if (isFromSelected) {
             from = '$direction #$street, $city, $department';
             fromLatLng = new LatLng(lat, lng);
           } else {
@@ -186,36 +190,39 @@ class ClientMapController{
     }
   }
 
-  void getNearbyDrivers(){
-    Stream<List<DocumentSnapshot>> stream = _geofireProvider.getNearbyDrivers(_position.latitude, _position.longitude, 10);
+  void getNearbyDrivers() {
+    Stream<List<DocumentSnapshot>> stream = _geofireProvider.getNearbyDrivers(
+        _position.latitude, _position.longitude, 10);
     stream.listen((List<DocumentSnapshot> documentList) {
-      for(MarkerId m in markers.keys){
+      for (MarkerId m in markers.keys) {
         bool remove = true;
-        for(DocumentSnapshot d in documentList){
-          if(m.value == d.id){
+        for (DocumentSnapshot d in documentList) {
+          if (m.value == d.id) {
             remove = false;
           }
         }
-        if(remove){
+        if (remove) {
           markers.remove(m);
           refresh();
         }
       }
 
-      for(DocumentSnapshot d in documentList){
+      for (DocumentSnapshot d in documentList) {
         GeoPoint point = d.data()['position']['geopoint'];
-        addMarker(d.id, point.latitude, point.longitude, 'Conductor disponible', '', markerDriver);
+        addMarker(d.id, point.latitude, point.longitude, 'Conductor disponible',
+            '', markerDriver);
       }
 
       refresh();
     });
   }
 
-  void centerPosition(){
-    if(_position != null){
+  void centerPosition() {
+    if (_position != null) {
       animateCameraToPosition(_position.latitude, _position.longitude);
     } else {
-      utils.Snackbar.showSnackbar(context, key, 'Activa el GPS para obtener la posición');
+      utils.Snackbar.showSnackbar(
+          context, key, 'Activa el GPS para obtener la posición');
     }
   }
 
@@ -288,18 +295,13 @@ class ClientMapController{
 
   Future<BitmapDescriptor> createMarkerImageFromAsset(String path) async {
     ImageConfiguration configuration = ImageConfiguration();
-    BitmapDescriptor bitmapDescriptor = await BitmapDescriptor.fromAssetImage(configuration, path);
+    BitmapDescriptor bitmapDescriptor =
+        await BitmapDescriptor.fromAssetImage(configuration, path);
     return bitmapDescriptor;
   }
 
-  void addMarker(
-      String markerId,
-      double lat,
-      double lng,
-      String title,
-      String content,
-      BitmapDescriptor iconMarker)
-  {
+  void addMarker(String markerId, double lat, double lng, String title,
+      String content, BitmapDescriptor iconMarker) {
     MarkerId id = MarkerId(markerId);
     Marker marker = Marker(
         markerId: id,
@@ -310,8 +312,7 @@ class ClientMapController{
         zIndex: 2,
         flat: true,
         anchor: Offset(0.5, 0.5),
-        rotation: _position.heading
-    );
+        rotation: _position.heading);
     markers[id] = marker;
   }
 }
