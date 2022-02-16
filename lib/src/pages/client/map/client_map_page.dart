@@ -77,7 +77,7 @@ class _CLientMapPageState extends State<CLientMapPage> {
       alignment: Alignment.centerLeft,
       margin: EdgeInsets.symmetric(horizontal: 60, vertical: 30),
       child: ButtonApp(
-        onPressed: (){},
+        onPressed: _con.requestDriver,
         text: 'Solicitar',
         color: Colors.amber,
         textColor: Colors.black,

@@ -128,6 +128,10 @@ class ClientMapController {
     }
   }
 
+  void requestDriver(){
+    Navigator.pushNamed(context, 'client/travel/info');
+  }
+
   Future<Null> showGoogleAutocomplete(bool isFrom) async {
     places.Prediction p = await PlacesAutocomplete.show(
         context: context,
