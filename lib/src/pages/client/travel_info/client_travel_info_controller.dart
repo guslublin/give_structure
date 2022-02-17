@@ -1,17 +1,22 @@
 
 import 'dart:async';
+import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:give_structure/src/api/environment.dart';
 import 'package:give_structure/src/models/directions.dart';
+import 'package:give_structure/src/models/prices.dart';
 import 'package:give_structure/src/providers/google_provider.dart';
+import 'package:give_structure/src/providers/price_provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class ClientTravelInfoController {
     BuildContext context;
 
     GoogleProvider _googleProvider;
+
+    PriceProvider _priceProvider;
 
     Function refresh;
     GlobalKey<ScaffoldState> key = new GlobalKey<ScaffoldState>();
@@ -38,6 +43,9 @@ class ClientTravelInfoController {
     String min;
     String km;
 
+    double minTotal;
+    double maxTotal;
+
     Future init(BuildContext context, Function refresh) async {
       this.context = context;
       this.refresh = refresh;
@@ -51,6 +59,7 @@ class ClientTravelInfoController {
       animateCameraToPosition(fromLatLng.latitude, fromLatLng.longitude);
 
       _googleProvider = new GoogleProvider();
+      _priceProvider = new PriceProvider();
 
       fromMarker = await createMarkerImageFromAsset('assets/img/map_pin_red.png');
       toMarker = await createMarkerImageFromAsset('assets/img/map_pin_blue.png');
@@ -67,6 +76,17 @@ class ClientTravelInfoController {
 
       min = _directions.duration.text;
       km = _directions.distance.text;
+      calculatePrice();
+      refresh();
+    }
+
+    void calculatePrice() async {
+      Prices prices = await _priceProvider.getAll();
+      double kmValue = double.parse(km.split(' ')[0]) * prices.km;
+      double minValue = double.parse(min.split(' ')[0]) * prices.min;
+      double total = kmValue + minValue;
+      minTotal = total - 0.5;
+      maxTotal = total + 0.5;
       refresh();
     }
 

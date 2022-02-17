@@ -58,7 +58,7 @@ class _ClientTravelInfoPageState extends State<ClientTravelInfoPage> {
   Widget _cardKmInfo(String km){
     return SafeArea(
         child: Container(
-          width: 110,
+          width: 120,
           padding: EdgeInsets.symmetric(horizontal: 30),
           margin: EdgeInsets.only(right: 10, top: 10),
           decoration: BoxDecoration(
@@ -73,7 +73,7 @@ class _ClientTravelInfoPageState extends State<ClientTravelInfoPage> {
   Widget _cardMinInfo(String km){
     return SafeArea(
         child: Container(
-          width: 110,
+          width: 120,
           padding: EdgeInsets.symmetric(horizontal: 30),
           margin: EdgeInsets.only(right: 10, top: 35),
           decoration: BoxDecoration(
@@ -145,7 +145,7 @@ class _ClientTravelInfoPageState extends State<ClientTravelInfoPage> {
               ),
             ),
             subtitle: Text(
-              '0.0 \$',
+              '${_con.minTotal?.toStringAsFixed(2) ?? '0.0'}\$ - ${_con.maxTotal?.toStringAsFixed(2) ?? '0.0'}\$',
               style: TextStyle(
                   fontSize: 13
               ),
