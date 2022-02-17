@@ -4,10 +4,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:give_structure/src/api/environment.dart';
+import 'package:give_structure/src/models/directions.dart';
+import 'package:give_structure/src/providers/google_provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class ClientTravelInfoController {
     BuildContext context;
+
+    GoogleProvider _googleProvider;
+
     Function refresh;
     GlobalKey<ScaffoldState> key = new GlobalKey<ScaffoldState>();
     Completer<GoogleMapController> _mapController = Completer();
@@ -28,6 +33,10 @@ class ClientTravelInfoController {
     BitmapDescriptor fromMarker;
     BitmapDescriptor toMarker;
 
+    Direction _directions;
+
+    String min;
+    String km;
 
     Future init(BuildContext context, Function refresh) async {
       this.context = context;
@@ -37,9 +46,28 @@ class ClientTravelInfoController {
       to = arguments['to'];
       fromLatLng = arguments['fromLatLng'];
       toLatLng = arguments['toLatLng'];
+
+      
       animateCameraToPosition(fromLatLng.latitude, fromLatLng.longitude);
+
+      _googleProvider = new GoogleProvider();
+
       fromMarker = await createMarkerImageFromAsset('assets/img/map_pin_red.png');
       toMarker = await createMarkerImageFromAsset('assets/img/map_pin_blue.png');
+      getGoogleMapsDirections(fromLatLng, toLatLng);
+    }
+
+    void getGoogleMapsDirections(LatLng from, LatLng to) async {
+      _directions = await _googleProvider.getGoogleMapsDirections(
+          from.latitude,
+          from.longitude,
+          to.latitude,
+          to.longitude
+      );
+
+      min = _directions.duration.text;
+      km = _directions.distance.text;
+      refresh();
     }
 
     Future<void> setPolylines() async {
