@@ -78,8 +78,8 @@ class ClientMapController {
 
   void getClientInfo() {
     Stream<DocumentSnapshot> clientStream =
-        _clientProvider.getByIdStream(_authProvider.getUser().uid);
-    _clientInfoSubscription = clientStream.listen((DocumentSnapshot document) {
+      _clientProvider.getByIdStream(_authProvider.getUser().uid);
+      _clientInfoSubscription = clientStream.listen((DocumentSnapshot document) {
       client = Client.fromJson(document.data());
       refresh();
     });
@@ -129,7 +129,20 @@ class ClientMapController {
   }
 
   void requestDriver(){
-    Navigator.pushNamed(context, 'client/travel/info');
+    if (fromLatLng != null && toLatLng != null){
+      Navigator.pushNamed(
+          context,
+          'client/travel/info',
+          arguments: {
+            'from': from,
+            'to': to,
+            'fromLatLng': fromLatLng,
+            'toLatLng': toLatLng
+          }
+      );
+    } else {
+      utils.Snackbar.showSnackbar(context, key, 'Debe seleccionar el lugar de recogida y destino');
+    }
   }
 
   Future<Null> showGoogleAutocomplete(bool isFrom) async {
