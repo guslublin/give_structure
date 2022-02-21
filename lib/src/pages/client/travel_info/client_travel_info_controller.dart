@@ -80,6 +80,10 @@ class ClientTravelInfoController {
       refresh();
     }
 
+    void goToRequest(){
+      Navigator.pushNamed(context, 'client/travel/request');
+    }
+
     void calculatePrice() async {
       Prices prices = await _priceProvider.getAll();
       double kmValue = double.parse(km.split(' ')[0]) * prices.km;
