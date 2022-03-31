@@ -81,7 +81,16 @@ class ClientTravelInfoController {
     }
 
     void goToRequest(){
-      Navigator.pushNamed(context, 'client/travel/request');
+      Navigator.pushNamed(
+          context,
+          'client/travel/request',
+          arguments: {
+            'from': from,
+            'to': to,
+            'fromLatLng': fromLatLng,
+            'toLatLng': toLatLng
+          }
+      );
     }
 
     void calculatePrice() async {

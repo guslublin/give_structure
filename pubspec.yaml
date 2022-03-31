@@ -51,6 +51,7 @@ dependencies:
   flutter_google_places: ^0.2.6
   flutter_polyline_points: ^0.2.4
   lottie: ^1.2.2
+  firebase_messaging: ^7.0.3
 
 dev_dependencies:
   flutter_test:
