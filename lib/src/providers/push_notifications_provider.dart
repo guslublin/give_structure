@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:give_structure/src/providers/client_provider.dart';
 import 'package:give_structure/src/providers/driver_provider.dart';
+import 'package:http/http.dart' as http;
 
 class PushNotificationsProvider {
   FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
@@ -72,6 +74,27 @@ class PushNotificationsProvider {
     }
   }
 
+  Future<void> sendMessage(String to, Map<String, dynamic> data, String title, String body) async {
+    await http.post(
+      'https://fcm.googleapis.com/fcm/send',
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'key=AAAARo9nwoE:APA91bHsOYSIzUrvafDpqxb_WymvgLxW3CKBTs6A0wvf2ttEimAtFc3XmiHcfo590rPzwMcB2d_yA2rf4nN47q6Gwn1yhiduEpJRsCPHFjH_U1yy2Ch6z6uyFhu5h-yuQ3MW4uEmL3iW'
+      },
+      body: jsonEncode(
+       <String, dynamic>  {
+         'notification': <String, dynamic>{
+           'body': body,
+           'title': title
+         },
+         'priority': 'high',
+         'ttl': '4500s',
+         'data': data,
+         'to': to
+       }
+      )
+    );
+  }
 
   void dispose(){
     _streamController?.onCancel;

@@ -11,6 +11,7 @@ class Driver {
     this.email,
     this.password,
     this.plate,
+    this.token
   });
 
   String id;
@@ -18,6 +19,7 @@ class Driver {
   String email;
   String password;
   String plate;
+  String token;
 
   factory Driver.fromJson(Map<String, dynamic> json) => Driver(
     id: json["id"],
@@ -25,6 +27,7 @@ class Driver {
     email: json["email"],
     password: json["password"],
     plate: json["plate"],
+    token: json["token"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -32,5 +35,6 @@ class Driver {
     "username": username,
     "email": email,
     "plate": plate,
+    "token": token,
   };
 }
