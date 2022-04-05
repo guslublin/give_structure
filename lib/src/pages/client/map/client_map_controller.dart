@@ -9,6 +9,7 @@ import 'package:give_structure/src/providers/auth_provider.dart';
 import 'package:give_structure/src/providers/client_provider.dart';
 import 'package:give_structure/src/providers/driver_provider.dart';
 import 'package:give_structure/src/providers/geofire_provider.dart';
+import 'package:give_structure/src/providers/push_notifications_provider.dart';
 import 'package:give_structure/src/utils/my_progress_dialog.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -41,6 +42,7 @@ class ClientMapController {
   AuthProvider _authProvider;
   DriverProvider _driverProvider;
   ClientProvider _clientProvider;
+  PushNotificationsProvider _pushNotificationsProvider;
 
   bool isConnect = false;
 
@@ -69,10 +71,12 @@ class ClientMapController {
     _authProvider = new AuthProvider();
     _driverProvider = new DriverProvider();
     _clientProvider = new ClientProvider();
+    _pushNotificationsProvider = new PushNotificationsProvider();
     _progressDialog =
         MyProgressDialog.createProgressDialog(context, 'Conectándose...');
     markerDriver = await createMarkerImageFromAsset('assets/img/icon_taxi.png');
     checkGPS();
+    saveToken();
     getClientInfo();
   }
 
@@ -172,7 +176,7 @@ class ClientMapController {
               fromLatLng = new LatLng(lat, lng);
             } else {
               to = '$direction, $city, $department';
-              fromLatLng = new LatLng(lat, lng);
+              toLatLng = new LatLng(lat, lng);
             }
             refresh();
           }
@@ -205,6 +209,10 @@ class ClientMapController {
         }
       }
     }
+  }
+
+  void saveToken(){
+    _pushNotificationsProvider.saveToken(_authProvider.getUser().uid, 'client');
   }
 
   void getNearbyDrivers() {
@@ -276,9 +284,17 @@ class ClientMapController {
     }
 
     permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
+      //if (permission == LocationPermission.denied) {
+      if (permission != LocationPermission.whileInUse &&
+          permission != LocationPermission.always) {
         // Permissions are denied, next time you could try
         // requesting permissions again (this is also where
         // Android's shouldShowRequestPermissionRationale
@@ -288,11 +304,7 @@ class ClientMapController {
       }
     }
 
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
+
 
     // When we reach here, permissions are granted and we can
     // continue accessing the position of the device.

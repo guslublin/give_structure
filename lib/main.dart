@@ -10,6 +10,7 @@ import 'package:give_structure/src/pages/driver/register/driver_register_page.da
 import 'package:give_structure/src/pages/home/home_page.dart';
 import 'package:give_structure/src/pages/login/login_page.dart';
 import 'package:give_structure/src/pages/client/register/client_register_page.dart';
+import 'package:give_structure/src/providers/push_notifications_provider.dart';
 import 'package:give_structure/src/utils/colors.dart' as utils;
 
 void main() async {
@@ -26,6 +27,14 @@ class GiveStructure extends StatefulWidget {
 }
 
 class _GiveStructureState extends State<GiveStructure> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    PushNotificationsProvider pushNotificationsProvider = new PushNotificationsProvider();
+    pushNotificationsProvider.initPushNotifications();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

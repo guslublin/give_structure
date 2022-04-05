@@ -7,6 +7,7 @@ import 'package:give_structure/src/models/driver.dart';
 import 'package:give_structure/src/providers/auth_provider.dart';
 import 'package:give_structure/src/providers/driver_provider.dart';
 import 'package:give_structure/src/providers/geofire_provider.dart';
+import 'package:give_structure/src/providers/push_notifications_provider.dart';
 import 'package:give_structure/src/utils/my_progress_dialog.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -36,6 +37,7 @@ class DriverMapController {
   GeofireProvider _geofireProvider;
   AuthProvider _authProvider;
   DriverProvider _driverProvider;
+  PushNotificationsProvider _pushNotificationsProvider;
 
   bool isConnect = false;
 
@@ -52,9 +54,11 @@ class DriverMapController {
     _geofireProvider = new GeofireProvider();
     _authProvider = new AuthProvider();
     _driverProvider = new DriverProvider();
+    _pushNotificationsProvider = new PushNotificationsProvider();
     _progressDialog = MyProgressDialog.createProgressDialog(context, 'Conectándose...');
     markerDriver = await createMarkerImageFromAsset('assets/img/taxi_icon.png');
     checkGPS();
+    saveToken();
     getDriverInfo();
   }
 
@@ -70,6 +74,10 @@ class DriverMapController {
     _positionStream?.cancel();
     _statusSuscription?.cancel();
     _driverInfoSuscription?.cancel();
+  }
+
+  void saveToken(){
+    _pushNotificationsProvider.saveToken(_authProvider.getUser().uid, 'driver');
   }
 
   void openDrawer(){
