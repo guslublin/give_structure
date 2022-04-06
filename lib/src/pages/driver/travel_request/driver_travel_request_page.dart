@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
+import 'package:give_structure/src/pages/driver/travel_request/driver_travel_request_controller.dart';
 import 'package:give_structure/src/utils/colors.dart' as utils;
 import 'package:give_structure/src/widgets/button_app.dart';
 
@@ -11,6 +13,16 @@ class DriverTravelRequestPage extends StatefulWidget {
 }
 
 class _DriverTravelRequestPageState extends State<DriverTravelRequestPage> {
+  DriverTravelRequestController _con = new DriverTravelRequestController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+      _con.init(context, refresh);
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -142,5 +154,11 @@ class _DriverTravelRequestPageState extends State<DriverTravelRequestPage> {
         ),
       ),
     );
+  }
+
+  void refresh(){
+    setState(() {
+
+    });
   }
 }

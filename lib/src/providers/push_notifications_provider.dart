@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:give_structure/src/providers/client_provider.dart';
 import 'package:give_structure/src/providers/driver_provider.dart';
+import 'package:give_structure/src/utils/shared_pref.dart';
 import 'package:http/http.dart' as http;
 
 class PushNotificationsProvider {
@@ -37,6 +38,9 @@ class PushNotificationsProvider {
       },
       onLaunch: (Map<String, dynamic> message){
         print('OnLaunch: $message');
+        _streamController.sink.add(message);
+        SharedPref sharedPref = new SharedPref();
+        sharedPref.save('isNotification', 'true');
       },
       onResume: (Map<String, dynamic> message){
         print('OnResume: $message');

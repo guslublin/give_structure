@@ -28,12 +28,21 @@ class GiveStructure extends StatefulWidget {
 }
 
 class _GiveStructureState extends State<GiveStructure> {
+  GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     PushNotificationsProvider pushNotificationsProvider = new PushNotificationsProvider();
     pushNotificationsProvider.initPushNotifications();
+    
+    pushNotificationsProvider.message.listen((data) {
+      print('------- Notificación Nueva -------');
+      print(data);
+
+      navigatorKey.currentState.pushNamed('driver/travel/request', arguments: data);
+    });
   }
 
   @override
@@ -41,6 +50,7 @@ class _GiveStructureState extends State<GiveStructure> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Give Structure",
+      navigatorKey: navigatorKey,
       theme: ThemeData(
           fontFamily: 'NimbusSans',
           appBarTheme: AppBarTheme(
