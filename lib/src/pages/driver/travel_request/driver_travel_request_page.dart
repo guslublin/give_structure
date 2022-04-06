@@ -16,6 +16,13 @@ class _DriverTravelRequestPageState extends State<DriverTravelRequestPage> {
   DriverTravelRequestController _con = new DriverTravelRequestController();
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _con.dispose();
+  }
+
+  @override
   void initState() {
     // TODO: implement initState
     super.initState();
@@ -74,7 +81,7 @@ class _DriverTravelRequestPageState extends State<DriverTravelRequestPage> {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 30),
       child: Text(
-        '0',
+        _con.seconds.toString(),
         style: TextStyle(
           fontSize: 50
         ),

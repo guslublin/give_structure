@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:give_structure/src/models/client.dart';
 import 'package:give_structure/src/providers/auth_provider.dart';
@@ -21,6 +23,9 @@ class DriverTravelRequestController {
   TravelInfoProvider _travelInfoProvider;
   AuthProvider _authProvider;
 
+  Timer _timer;
+  int seconds = 30;
+
   Future init(BuildContext context, Function refresh){
     this.context = context;
     this.refresh = refresh;
@@ -43,7 +48,21 @@ class DriverTravelRequestController {
     // idClient = arguments['idClient'];
 
     getClientInfo();
+    startTimer();
+  }
 
+  void dispose(){
+    _timer?.cancel();
+  }
+
+  void startTimer(){
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      seconds = seconds - 1;
+      refresh();
+      if(seconds == 0){
+        cancelTravel();
+      }
+    });
   }
 
   void acceptTravel(){
