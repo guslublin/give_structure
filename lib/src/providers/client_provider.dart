@@ -28,6 +28,7 @@ class ClientProvider{
     DocumentSnapshot document = await _ref.doc(id).get();
     if (document.exists) {
       Client client= Client.fromJson(document.data());
+      print('ClientProvider: ${client.toJson()}');
       return client;
     }
     return null;

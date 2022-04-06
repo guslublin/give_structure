@@ -29,7 +29,7 @@ class _DriverTravelRequestPageState extends State<DriverTravelRequestPage> {
       body: Column(
         children: [
           _bannerClientInfo(),
-          _textFromTo('Dirección 1', 'Dirección 2'),
+          _textFromTo(_con.from ?? '', _con.to ?? ''),
           _textTimeLimit()
         ],
       ),
@@ -143,7 +143,7 @@ class _DriverTravelRequestPageState extends State<DriverTravelRequestPage> {
             Container(
               margin: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
               child: Text(
-                'Tu cliente',
+                _con.client?.username ?? '',
                 style: TextStyle(
                   fontSize: 17,
                   color: Colors.white
