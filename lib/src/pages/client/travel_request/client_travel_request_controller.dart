@@ -10,6 +10,7 @@ import 'package:give_structure/src/providers/geofire_provider.dart';
 import 'package:give_structure/src/providers/push_notifications_provider.dart';
 import 'package:give_structure/src/providers/travel_info_provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:give_structure/src/utils/snackbar.dart' as utils;
 
 class ClientTravelRequestController {
   BuildContext context;
@@ -58,6 +59,11 @@ class ClientTravelRequestController {
       TravelInfo travelInfo = TravelInfo.fromJson(document.data());
       if(travelInfo.idDriver != null && travelInfo.status == 'accepted'){
         Navigator.pushNamedAndRemoveUntil(context, 'client/travel/map', (route) => false);
+      } else if(travelInfo.status == 'no_accepted'){
+        utils.Snackbar.showSnackbar(context, key, 'El conductor no aceptó la solicitud');
+        Future.delayed(Duration(milliseconds: 4000), (){
+          Navigator.pushNamedAndRemoveUntil(context, 'client/map', (route) => false);
+        });
       }
     });
   }

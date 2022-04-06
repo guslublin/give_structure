@@ -55,6 +55,14 @@ class DriverTravelRequestController {
     Navigator.pushNamedAndRemoveUntil(context, 'driver/travel/map', (route) => false);
   }
 
+  void cancelTravel(){
+    Map<String, dynamic> data = {
+      'status': 'no_accepted'
+    };
+    _travelInfoProvider.update(data, idClient);
+    Navigator.pushNamedAndRemoveUntil(context, 'driver/map', (route) => false);
+  }
+
   void getClientInfo() async {
     client = await _clientProvider.getById(idClient);
     print('Client ${client.toJson()}');

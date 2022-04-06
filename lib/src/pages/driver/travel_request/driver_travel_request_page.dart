@@ -48,7 +48,7 @@ class _DriverTravelRequestPageState extends State<DriverTravelRequestPage> {
           Container(
             width: MediaQuery.of(context).size.width * 0.45,
             child: ButtonApp(
-              onPressed: (){},
+              onPressed: _con.cancelTravel,
               text: 'Cancelar',
               color: Colors.red,
               textColor: Colors.white,
