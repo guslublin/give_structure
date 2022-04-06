@@ -19,4 +19,9 @@ class TravelInfoProvider{
       return Future.error(errorMessage);
     }
   }
+
+
+  Future<void> update(Map<String, dynamic> data, String id){
+    return _ref.doc(id).update(data);
+  }
 }
