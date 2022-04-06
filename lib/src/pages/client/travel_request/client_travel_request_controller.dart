@@ -30,6 +30,7 @@ class ClientTravelRequestController {
   List<String> nearbyDrivers = new List();
 
   StreamSubscription<List<DocumentSnapshot>> _streamSubscription;
+  StreamSubscription<DocumentSnapshot> _streamStatusSubscription;
 
   Future init(BuildContext context, Function refresh){
     this.context = context;
@@ -51,8 +52,19 @@ class ClientTravelRequestController {
     _getNearbyDrivers();
   }
 
+  void _checkDriverResponse(){
+    Stream<DocumentSnapshot> stream = _travelInfoProvider.getByIdStream(_authProvider.getUser().uid);
+    _streamStatusSubscription = stream.listen((DocumentSnapshot document) {
+      TravelInfo travelInfo = TravelInfo.fromJson(document.data());
+      if(travelInfo.idDriver != null && travelInfo.status == 'accepted'){
+        Navigator.pushNamedAndRemoveUntil(context, 'client/travel/map', (route) => false);
+      }
+    });
+  }
+
   void dispose() {
     _streamSubscription.cancel();
+    _streamStatusSubscription.cancel();
   }
 
   void _getNearbyDrivers() {
@@ -84,6 +96,7 @@ class ClientTravelRequestController {
     );
 
     await _travelInfoProvider.create(travelInfo);
+    _checkDriverResponse();
   }
 
   Future<void> getDriverInfo(idDriver) async{

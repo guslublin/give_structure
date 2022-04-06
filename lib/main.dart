@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:give_structure/src/pages/client/map/client_map_page.dart';
 import 'package:give_structure/src/pages/client/travel_info/client_travel_info_page.dart';
+import 'package:give_structure/src/pages/client/travel_map/client_travel_map_page.dart';
 import 'package:give_structure/src/pages/client/travel_request/client_travel_request_page.dart';
 import 'package:give_structure/src/pages/driver/map/driver_map_page.dart';
 import 'package:give_structure/src/pages/driver/register/driver_register_page.dart';
@@ -72,6 +73,7 @@ class _GiveStructureState extends State<GiveStructure> {
         'client/travel/info': (BuildContext context) => ClientTravelInfoPage(),
         'client/travel/request': (BuildContext context) => ClientTravelRequestPage(),
         'driver/travel/request': (BuildContext context) => DriverTravelRequestPage(),
+        'client/travel/map': (BuildContext context) => ClientTravelMapPage(),
         'driver/travel/map': (BuildContext context) => DriverTravelMapPage()
     },
     );

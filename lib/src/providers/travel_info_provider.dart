@@ -3,8 +3,13 @@ import 'package:give_structure/src/models/travel_info.dart';
 
 class TravelInfoProvider{
   CollectionReference _ref;
+
   TravelInfoProvider(){
     _ref = FirebaseFirestore.instance.collection('TravelInfo');
+  }
+
+  Stream<DocumentSnapshot> getByIdStream(String id){
+    return _ref.doc(id).snapshots(includeMetadataChanges: true);
   }
 
   Future<void> create(TravelInfo travelInfo){
