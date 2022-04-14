@@ -76,6 +76,7 @@ class DriverTravelRequestController {
     Navigator.pushNamed(context, 'driver/travel/map', arguments: idClient);
   }
 
+
   void cancelTravel(){
     Map<String, dynamic> data = {
       'status': 'no_accepted'
