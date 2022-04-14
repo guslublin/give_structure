@@ -55,7 +55,8 @@ class ClientTravelInfoController {
       fromLatLng = arguments['fromLatLng'];
       toLatLng = arguments['toLatLng'];
 
-      
+      print("Dentro de travel info controller: ${fromLatLng.latitude}, ${fromLatLng.longitude}, ${toLatLng.latitude}, ${toLatLng.longitude}");
+
       animateCameraToPosition(fromLatLng.latitude, fromLatLng.longitude);
 
       _googleProvider = new GoogleProvider();

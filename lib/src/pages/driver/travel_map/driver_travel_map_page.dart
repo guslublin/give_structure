@@ -161,6 +161,7 @@ class _DriverTravelMapPageState extends State<DriverTravelMapPage> {
       myLocationEnabled: false,
       myLocationButtonEnabled: false,
       markers: Set<Marker>.of(_con.markers.values),
+      polylines: _con.polylines,
     );
   }
 

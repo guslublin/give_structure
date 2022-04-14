@@ -58,7 +58,8 @@ class ClientTravelRequestController {
     _streamStatusSubscription = stream.listen((DocumentSnapshot document) {
       TravelInfo travelInfo = TravelInfo.fromJson(document.data());
       if(travelInfo.idDriver != null && travelInfo.status == 'accepted'){
-        Navigator.pushNamedAndRemoveUntil(context, 'client/travel/map', (route) => false);
+        //Navigator.pushNamedAndRemoveUntil(context, 'client/travel/map', (route) => false);
+        Navigator.pushNamed(context, 'client/travel/map');
       } else if(travelInfo.status == 'no_accepted'){
         utils.Snackbar.showSnackbar(context, key, 'El conductor no aceptó la solicitud');
         Future.delayed(Duration(milliseconds: 4000), (){
@@ -100,6 +101,8 @@ class ClientTravelRequestController {
       toLng: toLatLng.longitude,
       status: 'created'
     );
+
+    print("Dentro de Travel request controller: ${fromLatLng.latitude}, ${fromLatLng.longitude}, ${toLatLng.latitude}, ${toLatLng.longitude}");
 
     await _travelInfoProvider.create(travelInfo);
     _checkDriverResponse();

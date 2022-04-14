@@ -70,14 +70,17 @@ class DriverTravelRequestController {
       'idDriver': _authProvider.getUser().uid,
       'status': 'accepted'
     };
+    _timer?.cancel();
     _travelInfoProvider.update(data, idClient);
-    Navigator.pushNamedAndRemoveUntil(context, 'driver/travel/map', (route) => false);
+    //Navigator.pushNamedAndRemoveUntil(context, 'driver/travel/map', (route) => false, arguments: idClient);
+    Navigator.pushNamed(context, 'driver/travel/map', arguments: idClient);
   }
 
   void cancelTravel(){
     Map<String, dynamic> data = {
       'status': 'no_accepted'
     };
+    _timer?.cancel();
     _travelInfoProvider.update(data, idClient);
     Navigator.pushNamedAndRemoveUntil(context, 'driver/map', (route) => false);
   }

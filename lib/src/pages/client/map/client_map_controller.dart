@@ -133,6 +133,8 @@ class ClientMapController {
   }
 
   void requestDriver(){
+    print("Dentro de client map controller: ${fromLatLng.latitude}, ${fromLatLng.longitude}, ${toLatLng.latitude}, ${toLatLng.longitude}");
+
     if (fromLatLng != null && toLatLng != null){
       Navigator.pushNamed(
           context,

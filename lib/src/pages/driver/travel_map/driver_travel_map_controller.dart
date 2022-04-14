@@ -3,11 +3,15 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:give_structure/src/api/environment.dart';
 import 'package:give_structure/src/models/driver.dart';
+import 'package:give_structure/src/models/travel_info.dart';
 import 'package:give_structure/src/providers/auth_provider.dart';
 import 'package:give_structure/src/providers/driver_provider.dart';
 import 'package:give_structure/src/providers/geofire_provider.dart';
 import 'package:give_structure/src/providers/push_notifications_provider.dart';
+import 'package:give_structure/src/providers/travel_info_provider.dart';
 import 'package:give_structure/src/utils/my_progress_dialog.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -33,11 +37,15 @@ class DriverTravelMapController {
   StreamSubscription<Position> _positionStream;
 
   BitmapDescriptor markerDriver;
+  BitmapDescriptor fromMarker;
+  BitmapDescriptor toMarker;
 
   GeofireProvider _geofireProvider;
   AuthProvider _authProvider;
   DriverProvider _driverProvider;
   PushNotificationsProvider _pushNotificationsProvider;
+
+  TravelInfoProvider _travelInfoProvider;
 
   bool isConnect = false;
 
@@ -48,17 +56,59 @@ class DriverTravelMapController {
 
   Driver driver;
 
+  String _idTravel;
+
+  Set<Polyline> polylines = {};
+  List<LatLng> points = [];
+
+
   Future init(BuildContext context, Function refresh) async {
     this.context = context;
     this.refresh = refresh;
+    _idTravel = ModalRoute.of(context).settings.arguments as String;
     _geofireProvider = new GeofireProvider();
     _authProvider = new AuthProvider();
     _driverProvider = new DriverProvider();
+    _travelInfoProvider = new TravelInfoProvider();
     _pushNotificationsProvider = new PushNotificationsProvider();
     _progressDialog = MyProgressDialog.createProgressDialog(context, 'Conectándose...');
+    fromMarker = await createMarkerImageFromAsset('assets/img/map_pin_red.png');
+    toMarker = await createMarkerImageFromAsset('assets/img/map_pin_blue.png');
     markerDriver = await createMarkerImageFromAsset('assets/img/taxi_icon.png');
     checkGPS();
     getDriverInfo();
+  }
+
+  void _getTravelInfo() async {
+    TravelInfo travelInfo = await _travelInfoProvider.getById(_idTravel);
+    LatLng from = new LatLng(_position.latitude, _position.longitude);
+    LatLng to = new LatLng(travelInfo.fromLat, travelInfo.fromLng);
+
+    setPolylines(from, to);
+  }
+
+  Future<void> setPolylines(LatLng from, LatLng to) async {
+    PointLatLng pointFromLatLng = PointLatLng(from.latitude, from.longitude);
+    PointLatLng pointToLatLng = PointLatLng(to.latitude, to.longitude);
+    print("Polylines: ${from.latitude}, ${from.longitude}, ${to.latitude}, ${to.longitude}");
+    PolylineResult result = await PolylinePoints().getRouteBetweenCoordinates(
+        Environment.API_KEY_MAPS,
+        pointFromLatLng,
+        pointToLatLng
+    );
+    for (PointLatLng point in result.points){
+      points.add(LatLng(point.latitude, point.longitude));
+    }
+    Polyline polyline = Polyline(
+        polylineId: PolylineId('poly'),
+        color: Colors.amber,
+        points: points,
+        width: 6
+    );
+    polylines.add(polyline);
+    addSimpleMarker('from', to.latitude, to.longitude, 'Recoger aquí', '', fromMarker);
+    //addMarker('to', toLatLng.latitude, toLatLng.longitude, 'Destino', '', toMarker);
+    refresh();
   }
 
   void getDriverInfo(){
@@ -93,6 +143,7 @@ class DriverTravelMapController {
     try{
       await _determinePosition();
       _position = await Geolocator.getLastKnownPosition();
+      _getTravelInfo();
       centerPosition();
       saveLocation();
       addMarker('driver', _position.latitude, _position.longitude, 'Tu posición', '', markerDriver);
@@ -212,6 +263,24 @@ class DriverTravelMapController {
         flat: true,
         anchor: Offset(0.5, 0.5),
         rotation: _position.heading
+    );
+    markers[id] = marker;
+  }
+
+  void addSimpleMarker(
+      String markerId,
+      double lat,
+      double lng,
+      String title,
+      String content,
+      BitmapDescriptor iconMarker)
+  {
+    MarkerId id = MarkerId(markerId);
+    Marker marker = Marker(
+        markerId: id,
+        icon: iconMarker,
+        position: LatLng(lat, lng),
+        infoWindow: InfoWindow(title: title, snippet: content)
     );
     markers[id] = marker;
   }

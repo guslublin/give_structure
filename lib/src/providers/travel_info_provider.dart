@@ -14,6 +14,7 @@ class TravelInfoProvider{
 
   Future<void> create(TravelInfo travelInfo){
     String errorMessage;
+    print("create travel info: ${travelInfo.fromLat}, ${travelInfo.fromLng}");
     try{
       return _ref.doc(travelInfo.id).set(travelInfo.toJson());
     } catch(error) {
@@ -25,6 +26,15 @@ class TravelInfoProvider{
     }
   }
 
+  Future<TravelInfo> getById(String id) async{
+    DocumentSnapshot document = await _ref.doc(id).get();
+    if (document.exists) {
+      TravelInfo travelInfo= TravelInfo.fromJson(document.data());
+      print("travelInfo: ${travelInfo.fromLat}, ${travelInfo.fromLng}");
+      return travelInfo;
+    }
+    return null;
+  }
 
   Future<void> update(Map<String, dynamic> data, String id){
     return _ref.doc(id).update(data);
