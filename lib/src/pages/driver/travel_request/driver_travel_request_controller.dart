@@ -73,9 +73,8 @@ class DriverTravelRequestController {
     _timer?.cancel();
     _travelInfoProvider.update(data, idClient);
     //Navigator.pushNamedAndRemoveUntil(context, 'driver/travel/map', (route) => false, arguments: idClient);
-    Navigator.pushNamed(context, 'driver/travel/map', arguments: idClient);
+    Navigator.pushReplacementNamed(context, 'driver/travel/map', arguments: idClient);
   }
-
 
   void cancelTravel(){
     Map<String, dynamic> data = {
