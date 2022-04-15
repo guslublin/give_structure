@@ -66,9 +66,9 @@ class _DriverTravelMapPageState extends State<DriverTravelMapPage> {
       alignment: Alignment.centerLeft,
       margin: EdgeInsets.symmetric(horizontal: 60, vertical: 30),
       child: ButtonApp(
-        onPressed: (){},
-        text: 'Iniciar viaje',
-        color: Colors.amber,
+        onPressed: _con.updateStatus,
+        text: _con.currentStatus,
+        color: _con.colorStatus,
         textColor: Colors.black,
       ),
     );

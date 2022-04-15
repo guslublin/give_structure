@@ -46,8 +46,11 @@ class DriverTravelMapController {
   PushNotificationsProvider _pushNotificationsProvider;
 
   TravelInfoProvider _travelInfoProvider;
-
+  TravelInfo travelInfo;
   bool isConnect = false;
+
+  String currentStatus = 'Iniciar viaje';
+  Color colorStatus = Colors.amber;
 
   ProgressDialog _progressDialog;
 
@@ -79,11 +82,38 @@ class DriverTravelMapController {
     getDriverInfo();
   }
 
-  void _getTravelInfo() async {
-    TravelInfo travelInfo = await _travelInfoProvider.getById(_idTravel);
-    LatLng from = new LatLng(_position.latitude, _position.longitude);
-    LatLng to = new LatLng(travelInfo.fromLat, travelInfo.fromLng);
+  void  updateStatus() {
+    if (travelInfo.status == 'accepted') {
+      startTravel();
+    } else if(travelInfo.status == 'started'){
+      finishTravel();
+    }
+  }
 
+  void startTravel() async {
+    Map<String, dynamic> data = {
+      'status': 'started'
+    };
+    await _travelInfoProvider.update(data, _idTravel);
+    travelInfo.status = 'started';
+    currentStatus = 'Finalizar viaje';
+    colorStatus = Colors.cyan;
+    refresh();
+  }
+
+  void finishTravel() async {
+    Map<String, dynamic> data = {
+      'status': 'finished'
+    };
+    await _travelInfoProvider.update(data, _idTravel);
+    travelInfo.status = 'finished';
+    refresh();
+  }
+
+  void _getTravelInfo() async {
+    travelInfo = await _travelInfoProvider.getById(_idTravel);
+    LatLng from = new LatLng(_position.latitude, _position.longitude);
+    LatLng to = new LatLng(travelInfo.toLat, travelInfo.toLng);
     setPolylines(from, to);
   }
 

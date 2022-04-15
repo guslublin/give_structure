@@ -104,7 +104,6 @@ class ClientTravelMapController {
     LatLng to = new LatLng(travelInfo.fromLat, travelInfo.fromLng);
     addSimpleMarker('from', to.latitude, to.longitude, 'Recoger aquí', '', fromMarker);
     setPolylines(from, to);
-    animateCameraToPosition(_driverLatLng.latitude, _driverLatLng.longitude);
   }
 
   void checkTravelStatus() async {
@@ -130,6 +129,7 @@ class ClientTravelMapController {
     travelInfo = await _travelInfoProvider.getById(_authProvider.getUser().uid);
     getDriverInfo(travelInfo.idDriver);
     getDriverLocation(travelInfo.idDriver);
+    animateCameraToPosition(travelInfo.fromLat, travelInfo.fromLng);
   }
 
   Future<void> setPolylines(LatLng from, LatLng to) async {
