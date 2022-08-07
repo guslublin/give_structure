@@ -85,9 +85,9 @@ class DriverRegisterController {
           plate: plate
         );
         await _driverProvider.create(driver);
+        _progressDialog.hide();
         Navigator.pushNamedAndRemoveUntil(context, 'driver/map', (Route<dynamic> route) => false);
         utils.Snackbar.showSnackbar(context, key, 'El usuario se registró correctamente');
-        _progressDialog.hide();
         print('El usuario se registró correctamente');
       } else {
         utils.Snackbar.showSnackbar(context, key, 'El usuario no se pudo registrar');

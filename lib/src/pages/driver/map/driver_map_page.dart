@@ -86,6 +86,7 @@ class _DriverMapPageState extends State<DriverMapPage> {
   Widget _drawer() {
     return Drawer(
       child: ListView(
+        padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
             child: Column(

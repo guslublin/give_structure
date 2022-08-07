@@ -54,7 +54,7 @@ class DriverTravelMapController {
   StreamSubscription<DocumentSnapshot> _driverInfoSuscription;
 
   Set<Polyline> polylines = {};
-  List<LatLng> points = new List();
+  List<LatLng> points = [];
 
   Driver driver;
 

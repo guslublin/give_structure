@@ -28,7 +28,7 @@ class ClientTravelRequestController {
   GeofireProvider _geofireProvider;
   PushNotificationsProvider _pushNotificationsProvider;
 
-  List<String> nearbyDrivers = new List();
+  List<String> nearbyDrivers = [];
 
   StreamSubscription<List<DocumentSnapshot>> _streamSubscription;
   StreamSubscription<DocumentSnapshot> _streamStatusSubscription;
@@ -70,8 +70,8 @@ class ClientTravelRequestController {
   }
 
   void dispose() {
-    _streamSubscription.cancel();
-    _streamStatusSubscription.cancel();
+    _streamSubscription?.cancel();
+    _streamStatusSubscription?.cancel();
   }
 
   void _getNearbyDrivers() {
@@ -80,8 +80,8 @@ class ClientTravelRequestController {
         fromLatLng.longitude,
         5);
 
-    _streamSubscription = stream.listen((List<DocumentSnapshot> document) {
-      for(DocumentSnapshot d in document){
+    _streamSubscription = stream.listen((List<DocumentSnapshot> documentList) {
+      for(DocumentSnapshot d in documentList){
         print('Conductor encontrado ${d.id}');
         nearbyDrivers.add(d.id);
       }

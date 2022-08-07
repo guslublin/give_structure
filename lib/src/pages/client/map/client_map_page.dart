@@ -98,6 +98,7 @@ class _CLientMapPageState extends State<CLientMapPage> {
   Widget _drawer() {
     return Drawer(
       child: ListView(
+        padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
             child: Column(
@@ -231,7 +232,7 @@ class _CLientMapPageState extends State<CLientMapPage> {
                 height: 5,
               ),
               Container(
-                width: double.infinity,
+                //width: double.infinity,
                 child: Divider(
                   color: Colors.grey,
                   height: 10,
@@ -260,6 +261,7 @@ class _CLientMapPageState extends State<CLientMapPage> {
           Text(
             title,
             style: TextStyle(color: Colors.grey, fontSize: 10),
+            textAlign: TextAlign.start,
           ),
           Text(
             value,

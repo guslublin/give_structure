@@ -188,7 +188,8 @@ class ClientMapController {
   }
 
   Future<Null> setLocationDraggableInfo() async {
-    if (_position != null) {
+    //if (_position != null) {
+    if (initialPosition != null) {
       double lat = initialPosition.target.latitude;
       double lng = initialPosition.target.longitude;
       List<Placemark> address = await placemarkFromCoordinates(lat, lng);

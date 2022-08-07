@@ -109,7 +109,7 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
       ),
       child: TextField(
         obscureText: true,
-        controller: _con.confirmPasswordController,
+        controller: _con.passwordController,
         decoration: InputDecoration(
           labelText: 'Contraseña',
           suffixIcon: Icon(
@@ -128,7 +128,7 @@ class _ClientRegisterPageState extends State<ClientRegisterPage> {
       ),
       child: TextField(
         obscureText: true,
-        controller: _con.passwordController,
+        controller: _con.confirmPasswordController,
         decoration: InputDecoration(
           labelText: 'Confirmar Contraseña',
           suffixIcon: Icon(

@@ -115,7 +115,7 @@ class ClientTravelInfoController {
         points.add(LatLng(point.latitude, point.longitude));
       }
       Polyline polyline = Polyline(
-        polylineId: PolylineId('poli'),
+        polylineId: PolylineId('poly'),
         color: Colors.amber,
         points: points,
         width: 6

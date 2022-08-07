@@ -122,7 +122,7 @@ class _DriverRegisterPageState extends State<DriverRegisterPage> {
       ),
       child: TextField(
         obscureText: true,
-        controller: _con.confirmPasswordController,
+        controller: _con.passwordController,
         decoration: InputDecoration(
           labelText: 'Contraseña',
           suffixIcon: Icon(
@@ -141,7 +141,7 @@ class _DriverRegisterPageState extends State<DriverRegisterPage> {
       ),
       child: TextField(
         obscureText: true,
-        controller: _con.passwordController,
+        controller: _con.confirmPasswordController,
         decoration: InputDecoration(
           labelText: 'Confirmar Contraseña',
           suffixIcon: Icon(
