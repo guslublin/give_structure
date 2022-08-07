@@ -204,12 +204,11 @@ class DriverTravelMapController {
       _getTravelInfo();
       centerPosition();
       saveLocation();
-
       addMarker(
           'driver',
           _position.latitude,
           _position.longitude,
-          'Tu posicion',
+          'Tu posición',
           '',
           markerDriver
       );
