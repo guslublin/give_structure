@@ -189,7 +189,7 @@ class DriverTravelMapController {
   }
 
   void saveLocation() async {
-    await _geofireProvider.create(
+    await _geofireProvider.createWorking(
         _authProvider.getUser().uid,
         _position.latitude,
         _position.longitude
@@ -232,7 +232,7 @@ class DriverTravelMapController {
           isCloseToPickupPosition(from, to);
         }
 
-        // saveLocation();
+        saveLocation();
         refresh();
       });
 
