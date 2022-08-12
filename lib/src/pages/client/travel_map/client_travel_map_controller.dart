@@ -153,6 +153,7 @@ class ClientTravelMapController {
     animateCameraToPosition(travelInfo.fromLat, travelInfo.fromLng);
   }
 
+
   Future<void> setPolylines(LatLng from, LatLng to) async {
     PointLatLng pointFromLatLng = PointLatLng(from.latitude, from.longitude);
     PointLatLng pointToLatLng = PointLatLng(to.latitude, to.longitude);
