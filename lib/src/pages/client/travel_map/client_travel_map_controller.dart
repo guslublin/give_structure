@@ -51,6 +51,10 @@ class ClientTravelMapController {
 
   Color colorStatus = Colors.white;
 
+  bool isPickupTravel = false;
+
+  bool isStartTravel = false;
+
   ProgressDialog _progressDialog;
 
   StreamSubscription<DocumentSnapshot> _statusSuscription;
@@ -100,10 +104,13 @@ class ClientTravelMapController {
   }
 
   void pickupTravel(){
-    LatLng from = new LatLng(_driverLatLng.latitude, _driverLatLng.longitude);
-    LatLng to = new LatLng(travelInfo.fromLat, travelInfo.fromLng);
-    addSimpleMarker('from', to.latitude, to.longitude, 'Recoger aquí', '', fromMarker);
-    setPolylines(from, to);
+    if (isPickupTravel == false) {
+      isPickupTravel = true;
+      LatLng from = new LatLng(_driverLatLng.latitude, _driverLatLng.longitude);
+      LatLng to = new LatLng(travelInfo.fromLat, travelInfo.fromLng);
+      addSimpleMarker('from', to.latitude, to.longitude, 'Recoger aquí', '', fromMarker);
+      setPolylines(from, to);
+    }
   }
 
   void checkTravelStatus() async {
@@ -123,6 +130,20 @@ class ClientTravelMapController {
       }
       refresh();
     });
+  }
+
+  void startTravel(){
+    if (isStartTravel == false){
+      isStartTravel = true;
+      polylines = {};
+      points = [];
+      markers.remove(markers['from']);
+      addSimpleMarker('to', travelInfo.toLat, travelInfo.toLng, 'Destino', '', toMarker);
+      LatLng from = new LatLng(_driverLatLng.latitude, _driverLatLng.longitude);
+      LatLng to = new LatLng(travelInfo.toLat, travelInfo.toLng);
+      setPolylines(from, to);
+      refresh();
+    }
   }
 
   void _getTravelInfo() async {

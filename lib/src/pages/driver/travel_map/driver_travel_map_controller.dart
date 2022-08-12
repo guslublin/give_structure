@@ -115,6 +115,14 @@ class DriverTravelMapController {
       travelInfo.status = 'started';
       currentStatus = 'Finalizar viaje';
       colorStatus = Colors.cyan;
+      polylines = {};
+      points = [];
+      markers.remove(markers['from']);
+      addSimpleMarker('to', travelInfo.toLat, travelInfo.toLng, 'Destino', '', toMarker);
+      LatLng from = new LatLng(_position.latitude, _position.longitude);
+      LatLng to = new LatLng(travelInfo.toLat, travelInfo.toLng);
+      setPolylines(from, to);
+      refresh();
     }
     else {
       utils.Snackbar.showSnackbar(context, key, 'Debes estar cerca a la posicion del cliente para iniciar el viaje');
@@ -136,7 +144,7 @@ class DriverTravelMapController {
     travelInfo = await _travelInfoProvider.getById(_idTravel);
     LatLng from = new LatLng(_position.latitude, _position.longitude);
     LatLng to = new LatLng(travelInfo.fromLat, travelInfo.fromLng);
-
+    addSimpleMarker('from', to.latitude, to.longitude, 'Recoger aqui', '', fromMarker);
     setPolylines(from, to);
   }
 
@@ -163,7 +171,7 @@ class DriverTravelMapController {
 
     polylines.add(polyline);
 
-    addSimpleMarker('from', to.latitude, to.longitude, 'Recoger aqui', '', fromMarker);
+    // addSimpleMarker('from', to.latitude, to.longitude, 'Recoger aqui', '', fromMarker);
     // addMarker('to', toLatLng.latitude, toLatLng.longitude, 'Destino', '', toMarker);
 
     refresh();
