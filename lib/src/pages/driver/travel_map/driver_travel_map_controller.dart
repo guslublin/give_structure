@@ -66,6 +66,11 @@ class DriverTravelMapController {
 
   double _distanceBetween;
 
+  Timer  _timer;
+  int seconds = 0;
+  double mt = 0;
+  double km = 0;
+
   Future init(BuildContext context, Function refresh) async {
     this.context = context;
     this.refresh = refresh;
@@ -85,6 +90,13 @@ class DriverTravelMapController {
 
     checkGPS();
     getDriverInfo();
+  }
+
+  void startTimer(){
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      seconds = timer.tick;
+      refresh();
+    });
   }
 
   void isCloseToPickupPosition(LatLng from, LatLng to) {
@@ -117,11 +129,13 @@ class DriverTravelMapController {
       colorStatus = Colors.cyan;
       polylines = {};
       points = [];
-      markers.remove(markers['from']);
+      // markers.remove(markers['from']); No sirve
+      markers.removeWhere((key, marker) => marker.markerId.value == 'from');
       addSimpleMarker('to', travelInfo.toLat, travelInfo.toLng, 'Destino', '', toMarker);
       LatLng from = new LatLng(_position.latitude, _position.longitude);
       LatLng to = new LatLng(travelInfo.toLat, travelInfo.toLng);
       setPolylines(from, to);
+      startTimer();
       refresh();
     }
     else {
@@ -223,6 +237,11 @@ class DriverTravelMapController {
       refresh();
 
       _positionStream = Geolocator.getPositionStream(desiredAccuracy: LocationAccuracy.best, distanceFilter: 1).listen((Position position) {
+        if(travelInfo?.status == 'started'){
+          mt = mt + Geolocator.distanceBetween(_position.latitude, _position.longitude, position.latitude, position.longitude);
+          km = mt/1000;
+          print('---km recorridos---');
+        }
         _position = position;
         addMarker(
             'driver',

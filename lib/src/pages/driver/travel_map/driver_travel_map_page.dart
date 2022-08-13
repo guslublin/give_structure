@@ -42,8 +42,8 @@ class _DriverTravelMapPageState extends State<DriverTravelMapPage> {
                     _buttonUserInfo(),
                     Column(
                       children: [
-                        _cardKmInfo('0'),
-                        _cardMinInfo('0')
+                        _cardKmInfo(_con.km?.toStringAsFixed(1)),
+                        _cardMinInfo(_con.seconds?.toString())
                       ],
                     ),
                     _buttonCenterPosition()

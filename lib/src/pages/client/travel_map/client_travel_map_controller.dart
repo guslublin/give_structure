@@ -26,13 +26,13 @@ class ClientTravelMapController {
   GlobalKey<ScaffoldState> key = new GlobalKey<ScaffoldState>();
   Completer<GoogleMapController> _mapController = Completer();
 
-
   CameraPosition initialPosition = CameraPosition(
-      target: LatLng(-25.45115884604181, -57.43336174636765),
+      target: LatLng(1.2342774, -77.2645446),
       zoom: 14.0
   );
 
-  Map<MarkerId, Marker> markers = <MarkerId, Marker> {};
+  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
+
 
   BitmapDescriptor markerDriver;
   BitmapDescriptor fromMarker;
@@ -42,73 +42,77 @@ class ClientTravelMapController {
   AuthProvider _authProvider;
   DriverProvider _driverProvider;
   PushNotificationsProvider _pushNotificationsProvider;
-
   TravelInfoProvider _travelInfoProvider;
 
   bool isConnect = false;
-
-  String currentStatus = '';
-
-  Color colorStatus = Colors.white;
-
-  bool isPickupTravel = false;
-
-  bool isStartTravel = false;
-
   ProgressDialog _progressDialog;
 
   StreamSubscription<DocumentSnapshot> _statusSuscription;
   StreamSubscription<DocumentSnapshot> _driverInfoSuscription;
 
+  Set<Polyline> polylines = {};
+  List<LatLng> points = new List();
+
   Driver driver;
-
   LatLng _driverLatLng;
-
   TravelInfo travelInfo;
 
   bool isRouteReady = false;
 
-  String _idTravel;
+  String currentStatus = '';
+  Color colorStatus = Colors.white;
 
-  Set<Polyline> polylines = {};
-  List<LatLng> points = [];
-
+  bool isPickupTravel = false;
+  bool isStartTravel = false;
 
   Future init(BuildContext context, Function refresh) async {
     this.context = context;
     this.refresh = refresh;
+
     _geofireProvider = new GeofireProvider();
     _authProvider = new AuthProvider();
     _driverProvider = new DriverProvider();
     _travelInfoProvider = new TravelInfoProvider();
     _pushNotificationsProvider = new PushNotificationsProvider();
-    _progressDialog = MyProgressDialog.createProgressDialog(context, 'Conectándose...');
+    _progressDialog = MyProgressDialog.createProgressDialog(context, 'Conectandose...');
+
+    markerDriver = await createMarkerImageFromAsset('assets/img/icon_taxi.png');
     fromMarker = await createMarkerImageFromAsset('assets/img/map_pin_red.png');
     toMarker = await createMarkerImageFromAsset('assets/img/map_pin_blue.png');
-    markerDriver = await createMarkerImageFromAsset('assets/img/icon_taxi.png');
+
     checkGPS();
   }
 
-  void getDriverLocation(String idDriver){
+  void getDriverLocation(String idDriver) {
     Stream<DocumentSnapshot> stream = _geofireProvider.getLocationByIdStream(idDriver);
     stream.listen((DocumentSnapshot document) {
       GeoPoint geoPoint = document.data()['position']['geopoint'];
       _driverLatLng = new LatLng(geoPoint.latitude, geoPoint.longitude);
-      addSimpleMarker('driver', _driverLatLng.latitude, _driverLatLng.longitude, 'Tu conductor', '', markerDriver);
+      addSimpleMarker(
+          'driver',
+          _driverLatLng.latitude,
+          _driverLatLng.longitude,
+          'Tu conductor',
+          '',
+          markerDriver
+      );
+
       refresh();
-      if(!isRouteReady){
+
+      if (!isRouteReady) {
         isRouteReady = true;
         checkTravelStatus();
       }
+
     });
   }
 
-  void pickupTravel(){
+  void pickupTravel() {
     if (isPickupTravel == false) {
       isPickupTravel = true;
       LatLng from = new LatLng(_driverLatLng.latitude, _driverLatLng.longitude);
       LatLng to = new LatLng(travelInfo.fromLat, travelInfo.fromLng);
-      addSimpleMarker('from', to.latitude, to.longitude, 'Recoger aquí', '', fromMarker);
+      addSimpleMarker('from', to.latitude, to.longitude, 'Recoger aqui', '', fromMarker);
       setPolylines(from, to);
     }
   }
@@ -117,30 +121,45 @@ class ClientTravelMapController {
     Stream<DocumentSnapshot> stream = _travelInfoProvider.getByIdStream(_authProvider.getUser().uid);
     stream.listen((DocumentSnapshot document) {
       travelInfo = TravelInfo.fromJson(document.data());
-      if(travelInfo.status == 'accepted'){
+
+      if (travelInfo.status == 'accepted') {
         currentStatus = 'Viaje aceptado';
         colorStatus = Colors.white;
         pickupTravel();
-      } else if(travelInfo.status == 'started') {
+      }
+      else if (travelInfo.status == 'started') {
         currentStatus = 'Viaje iniciado';
         colorStatus = Colors.amber;
-      } else if(travelInfo.status == 'finished') {
+        startTravel();
+      }
+      else if (travelInfo.status == 'finished') {
         currentStatus = 'Viaje finalizado';
         colorStatus = Colors.cyan;
       }
+
       refresh();
+
     });
   }
 
-  void startTravel(){
-    if (isStartTravel == false){
+  void startTravel() {
+    if (!isStartTravel) {
       isStartTravel = true;
       polylines = {};
-      points = [];
-      markers.remove(markers['from']);
-      addSimpleMarker('to', travelInfo.toLat, travelInfo.toLng, 'Destino', '', toMarker);
+      points = List();
+      markers.removeWhere((key, marker) => marker.markerId.value == 'from');
+      addSimpleMarker(
+          'to',
+          travelInfo.toLat,
+          travelInfo.toLng,
+          'Destino',
+          '',
+          toMarker
+      );
+
       LatLng from = new LatLng(_driverLatLng.latitude, _driverLatLng.longitude);
       LatLng to = new LatLng(travelInfo.toLat, travelInfo.toLng);
+
       setPolylines(from, to);
       refresh();
     }
@@ -148,32 +167,39 @@ class ClientTravelMapController {
 
   void _getTravelInfo() async {
     travelInfo = await _travelInfoProvider.getById(_authProvider.getUser().uid);
+    animateCameraToPosition(travelInfo.fromLat, travelInfo.fromLng);
     getDriverInfo(travelInfo.idDriver);
     getDriverLocation(travelInfo.idDriver);
-    animateCameraToPosition(travelInfo.fromLat, travelInfo.fromLng);
   }
 
-
   Future<void> setPolylines(LatLng from, LatLng to) async {
+
+    print('------------------ENTRO SET POLYLINES------------------');
+
     PointLatLng pointFromLatLng = PointLatLng(from.latitude, from.longitude);
     PointLatLng pointToLatLng = PointLatLng(to.latitude, to.longitude);
-    print("Polylines: ${from.latitude}, ${from.longitude}, ${to.latitude}, ${to.longitude}");
+
     PolylineResult result = await PolylinePoints().getRouteBetweenCoordinates(
         Environment.API_KEY_MAPS,
         pointFromLatLng,
         pointToLatLng
     );
-    for (PointLatLng point in result.points){
+
+    for (PointLatLng point in result.points) {
       points.add(LatLng(point.latitude, point.longitude));
     }
+
     Polyline polyline = Polyline(
         polylineId: PolylineId('poly'),
         color: Colors.amber,
         points: points,
         width: 6
     );
+
     polylines.add(polyline);
-    //addMarker('to', toLatLng.latitude, toLatLng.longitude, 'Destino', '', toMarker);
+
+    // addMarker('to', toLatLng.latitude, toLatLng.longitude, 'Destino', '', toMarker);
+
     refresh();
   }
 
@@ -182,63 +208,69 @@ class ClientTravelMapController {
     refresh();
   }
 
-  void dispose(){
+  void dispose() {
     _statusSuscription?.cancel();
     _driverInfoSuscription?.cancel();
   }
 
-
-  void onMapCreated(GoogleMapController controller){
+  void onMapCreated(GoogleMapController controller) {
     controller.setMapStyle('[{"elementType":"geometry","stylers":[{"color":"#212121"}]},{"elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},{"elementType":"labels.text.stroke","stylers":[{"color":"#212121"}]},{"featureType":"administrative","elementType":"geometry","stylers":[{"color":"#757575"}]},{"featureType":"administrative.country","elementType":"labels.text.fill","stylers":[{"color":"#9e9e9e"}]},{"featureType":"administrative.land_parcel","stylers":[{"visibility":"off"}]},{"featureType":"administrative.locality","elementType":"labels.text.fill","stylers":[{"color":"#bdbdbd"}]},{"featureType":"poi","elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},{"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#181818"}]},{"featureType":"poi.park","elementType":"labels.text.fill","stylers":[{"color":"#616161"}]},{"featureType":"poi.park","elementType":"labels.text.stroke","stylers":[{"color":"#1b1b1b"}]},{"featureType":"road","elementType":"geometry.fill","stylers":[{"color":"#2c2c2c"}]},{"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#8a8a8a"}]},{"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#373737"}]},{"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#3c3c3c"}]},{"featureType":"road.highway.controlled_access","elementType":"geometry","stylers":[{"color":"#4e4e4e"}]},{"featureType":"road.local","elementType":"labels.text.fill","stylers":[{"color":"#616161"}]},{"featureType":"transit","elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},{"featureType":"water","elementType":"geometry","stylers":[{"color":"#000000"}]},{"featureType":"water","elementType":"labels.text.fill","stylers":[{"color":"#3d3d3d"}]}]');
     _mapController.complete(controller);
+
     _getTravelInfo();
   }
 
   void checkGPS() async {
     bool isLocationEnabled = await Geolocator.isLocationServiceEnabled();
     if (isLocationEnabled) {
-      print('GPS Activado');
-    } else {
-      print('GPS Desactivado');
+      print('GPS ACTIVADO');
+    }
+    else {
+      print('GPS DESACTIVADO');
       bool locationGPS = await location.Location().requestService();
       if (locationGPS) {
-        print('Activó el GPS');
+        print('ACTIVO EL GPS');
       }
     }
+
   }
 
   Future animateCameraToPosition(double latitude, double longitude) async {
     GoogleMapController controller = await _mapController.future;
     if (controller != null) {
-      controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-        bearing: 0,
-        zoom: 15,
-        target: LatLng(latitude, longitude),
-      )));
+      controller.animateCamera(CameraUpdate.newCameraPosition(
+          CameraPosition(
+              bearing: 0,
+              target: LatLng(latitude, longitude),
+              zoom: 17
+          )
+      ));
     }
   }
 
   Future<BitmapDescriptor> createMarkerImageFromAsset(String path) async {
     ImageConfiguration configuration = ImageConfiguration();
-    BitmapDescriptor bitmapDescriptor = await BitmapDescriptor.fromAssetImage(configuration, path);
+    BitmapDescriptor bitmapDescriptor =
+    await BitmapDescriptor.fromAssetImage(configuration, path);
     return bitmapDescriptor;
   }
-
   void addSimpleMarker(
       String markerId,
       double lat,
       double lng,
       String title,
       String content,
-      BitmapDescriptor iconMarker)
-  {
+      BitmapDescriptor iconMarker
+      ) {
+
     MarkerId id = MarkerId(markerId);
     Marker marker = Marker(
-        markerId: id,
-        icon: iconMarker,
-        position: LatLng(lat, lng),
-        infoWindow: InfoWindow(title: title, snippet: content)
+      markerId: id,
+      icon: iconMarker,
+      position: LatLng(lat, lng),
+      infoWindow: InfoWindow(title: title, snippet: content),
     );
+
     markers[id] = marker;
   }
 
