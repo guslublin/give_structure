@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:give_structure/src/api/environment.dart';
+import 'package:give_structure/src/models/TravelHistory.dart';
 import 'package:give_structure/src/models/client.dart';
 import 'package:give_structure/src/models/driver.dart';
 import 'package:give_structure/src/models/travel_info.dart';
@@ -14,6 +15,7 @@ import 'package:give_structure/src/providers/driver_provider.dart';
 import 'package:give_structure/src/providers/geofire_provider.dart';
 import 'package:give_structure/src/providers/price_provider.dart';
 import 'package:give_structure/src/providers/push_notifications_provider.dart';
+import 'package:give_structure/src/providers/travel_history_provider.dart';
 import 'package:give_structure/src/providers/travel_info_provider.dart';
 import 'package:give_structure/src/utils/my_progress_dialog.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -52,8 +54,9 @@ class DriverTravelMapController {
   DriverProvider _driverProvider;
   PushNotificationsProvider _pushNotificationsProvider;
   TravelInfoProvider _travelInfoProvider;
-  PriceProvider _priceProvider;
+  PriceProvider _pricesProvider;
   ClientProvider _clientProvider;
+  TravelHistoryProvider _travelHistoryProvider;
 
   bool isConnect = false;
   ProgressDialog _progressDialog;
@@ -62,7 +65,7 @@ class DriverTravelMapController {
   StreamSubscription<DocumentSnapshot> _driverInfoSuscription;
 
   Set<Polyline> polylines = {};
-  List<LatLng> points = new List();
+  List<LatLng> points = [];
 
   Driver driver;
   Client _client;
@@ -91,8 +94,9 @@ class DriverTravelMapController {
     _driverProvider = new DriverProvider();
     _travelInfoProvider = new TravelInfoProvider();
     _pushNotificationsProvider = new PushNotificationsProvider();
-    _priceProvider = new PriceProvider();
+    _pricesProvider = new PriceProvider();
     _clientProvider = new ClientProvider();
+    _travelHistoryProvider = new TravelHistoryProvider();
     _progressDialog = MyProgressDialog.createProgressDialog(context, 'Conectandose...');
 
     markerDriver = await createMarkerImageFromAsset('assets/img/taxi_icon.png');
@@ -108,7 +112,7 @@ class DriverTravelMapController {
   }
 
   Future<double> calculatePrice() async {
-    Prices prices = await _priceProvider.getAll();
+    Prices prices = await _pricesProvider.getAll();
 
     if (seconds < 60) seconds = 60;
     if (km == 0) km = 0.1;
@@ -209,9 +213,24 @@ class DriverTravelMapController {
     };
     await _travelInfoProvider.update(data, _idTravel);
     travelInfo.status = 'finished';
-    Navigator.pushNamedAndRemoveUntil(context, 'driver/travel/calification', (route) => false);
 
-    refresh();
+    saveTravelHistory(total);
+
+  }
+
+  void saveTravelHistory(double price) async {
+    TravelHistory travelHistory = new TravelHistory(
+        from: travelInfo.from,
+        to: travelInfo.to,
+        idDriver: _authProvider.getUser().uid,
+        idClient: _idTravel,
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+        price: price
+    );
+
+    String id = await _travelHistoryProvider.create(travelHistory);
+
+    Navigator.pushNamedAndRemoveUntil(context, 'driver/travel/calification', (route) => false, arguments: id);
   }
 
   void _getTravelInfo() async {

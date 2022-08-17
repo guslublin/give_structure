@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:give_structure/src/widgets/button_app.dart';
+import 'package:give_structure/src/pages/driver/travel_calification/driver_travel_calification_controller.dart';
 
 class DriverTravelCalificationPage extends StatefulWidget {
   @override
@@ -10,6 +12,18 @@ class DriverTravelCalificationPage extends StatefulWidget {
 }
 
 class _DriverTravelCalificationPageState extends State<DriverTravelCalificationPage> {
+
+  DriverTravelCalificationController _con = new DriverTravelCalificationController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+      _con.init(context, refresh);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,7 +49,6 @@ class _DriverTravelCalificationPageState extends State<DriverTravelCalificationP
       child: ButtonApp(
         onPressed: () {},
         text: 'CALIFICAR',
-        textColor: Colors.black,
         color: Colors.amber,
       ),
     );
@@ -141,5 +154,11 @@ class _DriverTravelCalificationPageState extends State<DriverTravelCalificationP
         ),
       ),
     );
+  }
+
+  void refresh() {
+    setState(() {
+
+    });
   }
 }
