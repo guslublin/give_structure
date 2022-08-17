@@ -209,6 +209,8 @@ class DriverTravelMapController {
     };
     await _travelInfoProvider.update(data, _idTravel);
     travelInfo.status = 'finished';
+    Navigator.pushNamedAndRemoveUntil(context, 'driver/travel/calification', (route) => false);
+
     refresh();
   }
 

@@ -22,6 +22,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:give_structure/src/widgets/bottom_sheet_client_info.dart';
 
 class ClientTravelMapController {
+
   BuildContext context;
   Function refresh;
   GlobalKey<ScaffoldState> key = new GlobalKey<ScaffoldState>();
@@ -33,6 +34,7 @@ class ClientTravelMapController {
   );
 
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
+
 
   BitmapDescriptor markerDriver;
   BitmapDescriptor fromMarker;
@@ -65,6 +67,10 @@ class ClientTravelMapController {
   bool isPickupTravel = false;
   bool isStartTravel = false;
 
+  StreamSubscription<DocumentSnapshot> _streamLocationController;
+
+  StreamSubscription<DocumentSnapshot> _streamTravelController;
+
   Future init(BuildContext context, Function refresh) async {
     this.context = context;
     this.refresh = refresh;
@@ -85,7 +91,7 @@ class ClientTravelMapController {
 
   void getDriverLocation(String idDriver) {
     Stream<DocumentSnapshot> stream = _geofireProvider.getLocationByIdStream(idDriver);
-    stream.listen((DocumentSnapshot document) {
+    _streamLocationController = stream.listen((DocumentSnapshot document) {
       GeoPoint geoPoint = document.data()['position']['geopoint'];
       _driverLatLng = new LatLng(geoPoint.latitude, geoPoint.longitude);
       addSimpleMarker(
@@ -119,7 +125,7 @@ class ClientTravelMapController {
 
   void checkTravelStatus() async {
     Stream<DocumentSnapshot> stream = _travelInfoProvider.getByIdStream(_authProvider.getUser().uid);
-    stream.listen((DocumentSnapshot document) {
+    _streamTravelController = stream.listen((DocumentSnapshot document) {
       travelInfo = TravelInfo.fromJson(document.data());
 
       if (travelInfo.status == 'accepted') {
@@ -225,6 +231,8 @@ class ClientTravelMapController {
   void dispose() {
     _statusSuscription?.cancel();
     _driverInfoSuscription?.cancel();
+    _streamLocationController?.cancel();
+    _streamTravelController?.cancel();
   }
 
   void onMapCreated(GoogleMapController controller) {

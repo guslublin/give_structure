@@ -8,6 +8,7 @@ import 'package:give_structure/src/pages/client/travel_map/client_travel_map_pag
 import 'package:give_structure/src/pages/client/travel_request/client_travel_request_page.dart';
 import 'package:give_structure/src/pages/driver/map/driver_map_page.dart';
 import 'package:give_structure/src/pages/driver/register/driver_register_page.dart';
+import 'package:give_structure/src/pages/driver/travel_calification/driver_travel_calification_page.dart';
 import 'package:give_structure/src/pages/driver/travel_map/driver_travel_map_page.dart';
 import 'package:give_structure/src/pages/driver/travel_request/driver_travel_request_page.dart';
 import 'package:give_structure/src/pages/home/home_page.dart';
@@ -74,7 +75,8 @@ class _GiveStructureState extends State<GiveStructure> {
         'client/travel/request': (BuildContext context) => ClientTravelRequestPage(),
         'driver/travel/request': (BuildContext context) => DriverTravelRequestPage(),
         'client/travel/map': (BuildContext context) => ClientTravelMapPage(),
-        'driver/travel/map': (BuildContext context) => DriverTravelMapPage()
+        'driver/travel/map': (BuildContext context) => DriverTravelMapPage(),
+        'driver/travel/calification' : (BuildContext context) => DriverTravelCalificationPage(),
     },
     );
   }
