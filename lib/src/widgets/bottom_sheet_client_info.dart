@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
 
-class BottomSheetDriverInfo extends StatefulWidget {
+class BottomSheetClientInfo extends StatefulWidget {
 
   String imageUrl;
   String username;
   String email;
+  String plate;
 
-  BottomSheetDriverInfo({
+  BottomSheetClientInfo({
     @required this.imageUrl,
     @required this.username,
     @required this.email,
+    @required this.plate,
   });
 
   @override
-  _BottomSheetDriverInfoState createState() => _BottomSheetDriverInfoState();
+  _BottomSheetClientInfoState createState() => _BottomSheetClientInfoState();
 }
 
-class _BottomSheetDriverInfoState extends State<BottomSheetDriverInfo> {
+class _BottomSheetClientInfoState extends State<BottomSheetClientInfo> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -25,7 +27,7 @@ class _BottomSheetDriverInfoState extends State<BottomSheetDriverInfo> {
       child: Column(
         children: [
           Text(
-            'Tu Cliente',
+            'Tu Conductor',
             style: TextStyle(
                 fontSize: 18
             ),
@@ -57,6 +59,17 @@ class _BottomSheetDriverInfoState extends State<BottomSheetDriverInfo> {
             ),
             leading: Icon(Icons.email),
           ),
+          ListTile(
+            title: Text(
+              'Placa del vehiculo',
+              style: TextStyle(fontSize: 15),
+            ),
+            subtitle: Text(
+              widget.plate ?? '',
+              style: TextStyle(fontSize: 15),
+            ),
+            leading: Icon(Icons.directions_car_rounded),
+          )
         ],
       ),
     );

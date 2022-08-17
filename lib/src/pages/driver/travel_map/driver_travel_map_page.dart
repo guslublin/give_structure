@@ -6,7 +6,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:give_structure/src/pages/driver/travel_map/driver_travel_map_controller.dart';
 import 'package:give_structure/src/widgets/button_app.dart';
 
-
 class DriverTravelMapPage extends StatefulWidget {
   @override
   _DriverTravelMapPageState createState() => _DriverTravelMapPageState();

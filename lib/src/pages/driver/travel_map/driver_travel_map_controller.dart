@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:give_structure/src/api/environment.dart';
+import 'package:give_structure/src/models/client.dart';
 import 'package:give_structure/src/models/driver.dart';
 import 'package:give_structure/src/models/travel_info.dart';
 import 'package:give_structure/src/models/prices.dart';
@@ -20,7 +21,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:location/location.dart' as location;
 import 'package:give_structure/src/utils/snackbar.dart' as utils;
 import 'package:progress_dialog/progress_dialog.dart';
-
+import 'package:give_structure/src/providers/client_provider.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:give_structure/src/widgets/bottom_sheet_driver_info.dart';
 
@@ -51,7 +52,8 @@ class DriverTravelMapController {
   DriverProvider _driverProvider;
   PushNotificationsProvider _pushNotificationsProvider;
   TravelInfoProvider _travelInfoProvider;
-  PriceProvider _pricesProvider;
+  PriceProvider _priceProvider;
+  ClientProvider _clientProvider;
 
   bool isConnect = false;
   ProgressDialog _progressDialog;
@@ -63,6 +65,7 @@ class DriverTravelMapController {
   List<LatLng> points = new List();
 
   Driver driver;
+  Client _client;
 
   String _idTravel;
   TravelInfo travelInfo;
@@ -88,7 +91,8 @@ class DriverTravelMapController {
     _driverProvider = new DriverProvider();
     _travelInfoProvider = new TravelInfoProvider();
     _pushNotificationsProvider = new PushNotificationsProvider();
-    _pricesProvider = new PriceProvider();
+    _priceProvider = new PriceProvider();
+    _clientProvider = new ClientProvider();
     _progressDialog = MyProgressDialog.createProgressDialog(context, 'Conectandose...');
 
     markerDriver = await createMarkerImageFromAsset('assets/img/taxi_icon.png');
@@ -99,8 +103,12 @@ class DriverTravelMapController {
     getDriverInfo();
   }
 
+  void getClientInfo() async {
+    _client = await _clientProvider.getById(_idTravel);
+  }
+
   Future<double> calculatePrice() async {
-    Prices prices = await _pricesProvider.getAll();
+    Prices prices = await _priceProvider.getAll();
 
     if (seconds < 60) seconds = 60;
     if (km == 0) km = 0.1;
@@ -210,7 +218,7 @@ class DriverTravelMapController {
     LatLng to = new LatLng(travelInfo.fromLat, travelInfo.fromLng);
     addSimpleMarker('from', to.latitude, to.longitude, 'Recoger aqui', '', fromMarker);
     setPolylines(from, to);
-
+    getClientInfo();
   }
 
   Future<void> setPolylines(LatLng from, LatLng to) async {
@@ -328,13 +336,14 @@ class DriverTravelMapController {
   }
 
   void openBottomSheet() {
+    if (_client == null) return;
+
     showMaterialModalBottomSheet(
         context: context,
         builder: (context) => BottomSheetDriverInfo(
           imageUrl: '',
-          username: 'Jonathan',
-          email: 'jonathan@gmail.com',
-          plate: 'AAA-111',
+          username: _client?.username,
+          email: _client?.email,
         )
     );
   }

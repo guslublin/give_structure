@@ -18,6 +18,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:location/location.dart' as location;
 import 'package:give_structure/src/utils/snackbar.dart' as utils;
 import 'package:progress_dialog/progress_dialog.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:give_structure/src/widgets/bottom_sheet_client_info.dart';
 
 class ClientTravelMapController {
 
@@ -108,7 +110,7 @@ class ClientTravelMapController {
   }
 
   void pickupTravel() {
-    if (isPickupTravel == false) {
+    if (!isPickupTravel) {
       isPickupTravel = true;
       LatLng from = new LatLng(_driverLatLng.latitude, _driverLatLng.longitude);
       LatLng to = new LatLng(travelInfo.fromLat, travelInfo.fromLng);
@@ -140,6 +142,20 @@ class ClientTravelMapController {
       refresh();
 
     });
+  }
+
+  void openBottomSheet() {
+    if (driver == null) return;
+
+    showMaterialModalBottomSheet(
+        context: context,
+        builder: (context) => BottomSheetClientInfo(
+          imageUrl: '',
+          username: driver?.username,
+          email: driver?.email,
+          plate: driver?.plate,
+        )
+    );
   }
 
   void startTravel() {
