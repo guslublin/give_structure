@@ -7,9 +7,11 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:give_structure/src/api/environment.dart';
 import 'package:give_structure/src/models/driver.dart';
 import 'package:give_structure/src/models/travel_info.dart';
+import 'package:give_structure/src/models/prices.dart';
 import 'package:give_structure/src/providers/auth_provider.dart';
 import 'package:give_structure/src/providers/driver_provider.dart';
 import 'package:give_structure/src/providers/geofire_provider.dart';
+import 'package:give_structure/src/providers/price_provider.dart';
 import 'package:give_structure/src/providers/push_notifications_provider.dart';
 import 'package:give_structure/src/providers/travel_info_provider.dart';
 import 'package:give_structure/src/utils/my_progress_dialog.dart';
@@ -18,7 +20,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:location/location.dart' as location;
 import 'package:give_structure/src/utils/snackbar.dart' as utils;
 import 'package:progress_dialog/progress_dialog.dart';
-
 
 class DriverTravelMapController {
 
@@ -46,6 +47,7 @@ class DriverTravelMapController {
   DriverProvider _driverProvider;
   PushNotificationsProvider _pushNotificationsProvider;
   TravelInfoProvider _travelInfoProvider;
+  PriceProvider _priceProvider;
 
   bool isConnect = false;
   ProgressDialog _progressDialog;
@@ -54,7 +56,7 @@ class DriverTravelMapController {
   StreamSubscription<DocumentSnapshot> _driverInfoSuscription;
 
   Set<Polyline> polylines = {};
-  List<LatLng> points = [];
+  List<LatLng> points = new List();
 
   Driver driver;
 
@@ -66,7 +68,7 @@ class DriverTravelMapController {
 
   double _distanceBetween;
 
-  Timer  _timer;
+  Timer _timer;
   int seconds = 0;
   double mt = 0;
   double km = 0;
@@ -82,6 +84,7 @@ class DriverTravelMapController {
     _driverProvider = new DriverProvider();
     _travelInfoProvider = new TravelInfoProvider();
     _pushNotificationsProvider = new PushNotificationsProvider();
+    _priceProvider = new PriceProvider();
     _progressDialog = MyProgressDialog.createProgressDialog(context, 'Conectandose...');
 
     markerDriver = await createMarkerImageFromAsset('assets/img/taxi_icon.png');
@@ -92,7 +95,36 @@ class DriverTravelMapController {
     getDriverInfo();
   }
 
-  void startTimer(){
+  Future<double> calculatePrice() async {
+    Prices prices = await _priceProvider.getAll();
+
+    if (seconds < 60) seconds = 60;
+    if (km == 0) km = 0.1;
+
+    int min = seconds ~/ 60;
+
+    print('=========== MIN TOTALES ==============');
+    print(min.toString());
+
+    print('=========== KM TOTALES ==============');
+    print(km.toString());
+
+    double priceMin = min * prices.min;
+    double priceKm = km * prices.km;
+
+    double total = priceMin + priceKm;
+
+    if (total < prices.minValue) {
+      total = prices.minValue;
+    }
+
+    print('=========== TOTAL ==============');
+    print(total.toString());
+
+    return total;
+  }
+
+  void startTimer() {
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       seconds = timer.tick;
       refresh();
@@ -125,15 +157,25 @@ class DriverTravelMapController {
       };
       await _travelInfoProvider.update(data, _idTravel);
       travelInfo.status = 'started';
-      currentStatus = 'Finalizar viaje';
+      currentStatus = 'FINALIZAR VIAJE';
       colorStatus = Colors.cyan;
+
       polylines = {};
-      points = [];
-      // markers.remove(markers['from']); No sirve
+      points = List();
+      // markers.remove(markers['from']);
       markers.removeWhere((key, marker) => marker.markerId.value == 'from');
-      addSimpleMarker('to', travelInfo.toLat, travelInfo.toLng, 'Destino', '', toMarker);
+      addSimpleMarker(
+          'to',
+          travelInfo.toLat,
+          travelInfo.toLng,
+          'Destino',
+          '',
+          toMarker
+      );
+
       LatLng from = new LatLng(_position.latitude, _position.longitude);
       LatLng to = new LatLng(travelInfo.toLat, travelInfo.toLng);
+
       setPolylines(from, to);
       startTimer();
       refresh();
@@ -146,6 +188,10 @@ class DriverTravelMapController {
   }
 
   void finishTravel() async {
+    _timer?.cancel();
+
+    double total = await calculatePrice();
+
     Map<String, dynamic> data = {
       'status': 'finished'
     };
@@ -160,6 +206,7 @@ class DriverTravelMapController {
     LatLng to = new LatLng(travelInfo.fromLat, travelInfo.fromLng);
     addSimpleMarker('from', to.latitude, to.longitude, 'Recoger aqui', '', fromMarker);
     setPolylines(from, to);
+
   }
 
   Future<void> setPolylines(LatLng from, LatLng to) async {
@@ -185,7 +232,6 @@ class DriverTravelMapController {
 
     polylines.add(polyline);
 
-    // addSimpleMarker('from', to.latitude, to.longitude, 'Recoger aqui', '', fromMarker);
     // addMarker('to', toLatLng.latitude, toLatLng.longitude, 'Destino', '', toMarker);
 
     refresh();
@@ -200,6 +246,7 @@ class DriverTravelMapController {
   }
 
   void dispose() {
+    _timer?.cancel();
     _positionStream?.cancel();
     _statusSuscription?.cancel();
     _driverInfoSuscription?.cancel();
@@ -226,22 +273,30 @@ class DriverTravelMapController {
       _getTravelInfo();
       centerPosition();
       saveLocation();
+
       addMarker(
           'driver',
           _position.latitude,
           _position.longitude,
-          'Tu posición',
+          'Tu posicion',
           '',
           markerDriver
       );
       refresh();
 
-      _positionStream = Geolocator.getPositionStream(desiredAccuracy: LocationAccuracy.best, distanceFilter: 1).listen((Position position) {
-        if(travelInfo?.status == 'started'){
-          mt = mt + Geolocator.distanceBetween(_position.latitude, _position.longitude, position.latitude, position.longitude);
-          km = mt/1000;
-          print('---km recorridos---');
+      _positionStream = Geolocator.getPositionStream(desiredAccuracy: LocationAccuracy.best, distanceFilter: 1)
+          .listen((Position position) {
+
+        if (travelInfo?.status == 'started') {
+          mt = mt + Geolocator.distanceBetween(
+              _position.latitude,
+              _position.longitude,
+              position.latitude,
+              position.longitude
+          );
+          km = mt / 1000;
         }
+
         _position = position;
         addMarker(
             'driver',
