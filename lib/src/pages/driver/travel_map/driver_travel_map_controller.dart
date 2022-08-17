@@ -21,6 +21,10 @@ import 'package:location/location.dart' as location;
 import 'package:give_structure/src/utils/snackbar.dart' as utils;
 import 'package:progress_dialog/progress_dialog.dart';
 
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:give_structure/src/widgets/bottom_sheet_driver_info.dart';
+
+
 class DriverTravelMapController {
 
   BuildContext context;
@@ -47,7 +51,7 @@ class DriverTravelMapController {
   DriverProvider _driverProvider;
   PushNotificationsProvider _pushNotificationsProvider;
   TravelInfoProvider _travelInfoProvider;
-  PriceProvider _priceProvider;
+  PriceProvider _pricesProvider;
 
   bool isConnect = false;
   ProgressDialog _progressDialog;
@@ -84,7 +88,7 @@ class DriverTravelMapController {
     _driverProvider = new DriverProvider();
     _travelInfoProvider = new TravelInfoProvider();
     _pushNotificationsProvider = new PushNotificationsProvider();
-    _priceProvider = new PriceProvider();
+    _pricesProvider = new PriceProvider();
     _progressDialog = MyProgressDialog.createProgressDialog(context, 'Conectandose...');
 
     markerDriver = await createMarkerImageFromAsset('assets/img/taxi_icon.png');
@@ -96,7 +100,7 @@ class DriverTravelMapController {
   }
 
   Future<double> calculatePrice() async {
-    Prices prices = await _priceProvider.getAll();
+    Prices prices = await _pricesProvider.getAll();
 
     if (seconds < 60) seconds = 60;
     if (km == 0) km = 0.1;
@@ -321,6 +325,18 @@ class DriverTravelMapController {
     } catch(error) {
       print('Error en la localizacion: $error');
     }
+  }
+
+  void openBottomSheet() {
+    showMaterialModalBottomSheet(
+        context: context,
+        builder: (context) => BottomSheetDriverInfo(
+          imageUrl: '',
+          username: 'Jonathan',
+          email: 'jonathan@gmail.com',
+          plate: 'AAA-111',
+        )
+    );
   }
 
   void centerPosition() {

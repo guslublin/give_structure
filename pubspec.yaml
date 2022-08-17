@@ -52,6 +52,7 @@ dependencies:
   flutter_polyline_points: ^0.2.4
   lottie: ^1.2.2
   firebase_messaging: ^7.0.3
+  modal_bottom_sheet: ^1.0.0+1
 
 dev_dependencies:
   flutter_test:

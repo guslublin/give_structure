@@ -4,17 +4,17 @@ import 'package:give_structure/src/widgets/button_app.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:give_structure/src/pages/driver/travel_map/driver_travel_map_controller.dart';
+import 'package:give_structure/src/widgets/button_app.dart';
+
 
 class DriverTravelMapPage extends StatefulWidget {
-  const DriverTravelMapPage({Key key}) : super(key: key);
-
   @override
-  State<DriverTravelMapPage> createState() => _DriverTravelMapPageState();
+  _DriverTravelMapPageState createState() => _DriverTravelMapPageState();
 }
 
 class _DriverTravelMapPageState extends State<DriverTravelMapPage> {
-  DriverTravelMapController _con = new DriverTravelMapController();
 
+  DriverTravelMapController _con = new DriverTravelMapController();
 
   @override
   void initState() {
@@ -25,9 +25,9 @@ class _DriverTravelMapPageState extends State<DriverTravelMapPage> {
     });
   }
 
-
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
+
     return Scaffold(
       key: _con.key,
       body: Stack(
@@ -46,7 +46,8 @@ class _DriverTravelMapPageState extends State<DriverTravelMapPage> {
                         _cardMinInfo(_con.seconds?.toString())
                       ],
                     ),
-                    _buttonCenterPosition()
+
+                    _buttonCenterPosition(),
                   ],
                 ),
                 Expanded(child: Container()),
@@ -59,29 +60,14 @@ class _DriverTravelMapPageState extends State<DriverTravelMapPage> {
     );
   }
 
-
-  Widget _buttonStatus(){
-    return Container(
-      height: 50,
-      alignment: Alignment.centerLeft,
-      margin: EdgeInsets.symmetric(horizontal: 60, vertical: 30),
-      child: ButtonApp(
-        onPressed: _con.updateStatus,
-        text: _con.currentStatus,
-        color: _con.colorStatus,
-        textColor: Colors.black,
-      ),
-    );
-  }
-
-  Widget _cardKmInfo(String km){
+  Widget _cardKmInfo(String km) {
     return SafeArea(
         child: Container(
           width: 110,
           margin: EdgeInsets.only(top: 10),
           decoration: BoxDecoration(
-            color: Colors.amber,
-            borderRadius: BorderRadius.all(Radius.circular(20)),
+              color: Colors.amber,
+              borderRadius: BorderRadius.all(Radius.circular(20))
           ),
           child: Text(
             '${km ?? ''} km',
@@ -92,14 +78,15 @@ class _DriverTravelMapPageState extends State<DriverTravelMapPage> {
     );
   }
 
-  Widget _cardMinInfo(String min){
+
+  Widget _cardMinInfo(String min) {
     return SafeArea(
         child: Container(
           width: 110,
           margin: EdgeInsets.only(top: 10),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.all(Radius.circular(20)),
+              color: Colors.white,
+              borderRadius: BorderRadius.all(Radius.circular(20))
           ),
           child: Text(
             '${min ?? ''} seg',
@@ -110,50 +97,67 @@ class _DriverTravelMapPageState extends State<DriverTravelMapPage> {
     );
   }
 
-  Widget _buttonUserInfo(){
+  Widget _buttonUserInfo() {
     return GestureDetector(
-      onTap: (){},
+      onTap: _con.openBottomSheet,
       child: Container(
         alignment: Alignment.centerLeft,
         margin: EdgeInsets.symmetric(horizontal: 5),
         child: Card(
+          shape: CircleBorder(),
           color: Colors.white,
           elevation: 4.0,
-          shape: CircleBorder(),
           child: Container(
-              padding: EdgeInsets.all(10),
-              child: Icon(Icons.person,
-                color: Colors.grey[600],
-                size: 20,)
+            padding: EdgeInsets.all(10),
+            child: Icon(
+              Icons.person,
+              color: Colors.grey[600],
+              size: 20,
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buttonCenterPosition(){
+  Widget _buttonCenterPosition() {
     return GestureDetector(
       onTap: _con.centerPosition,
       child: Container(
         alignment: Alignment.centerRight,
         margin: EdgeInsets.symmetric(horizontal: 5),
         child: Card(
+          shape: CircleBorder(),
           color: Colors.white,
           elevation: 4.0,
-          shape: CircleBorder(),
           child: Container(
-              padding: EdgeInsets.all(10),
-              child: Icon(Icons.location_searching,
-                color: Colors.grey[600],
-                size: 20,)
+            padding: EdgeInsets.all(10),
+            child: Icon(
+              Icons.location_searching,
+              color: Colors.grey[600],
+              size: 20,
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _googleMapsWidget(){
+  Widget _buttonStatus() {
+    return Container(
+      height: 50,
+      alignment: Alignment.bottomCenter,
+      margin: EdgeInsets.symmetric(horizontal: 60, vertical: 30),
+      child: ButtonApp(
+        onPressed: _con.updateStatus,
+        text: _con.currentStatus,
+        color: _con.colorStatus,
+        textColor: Colors.black,
+      ),
+    );
+  }
 
+  Widget _googleMapsWidget() {
     return GoogleMap(
       mapType: MapType.normal,
       initialCameraPosition: _con.initialPosition,
@@ -165,7 +169,7 @@ class _DriverTravelMapPageState extends State<DriverTravelMapPage> {
     );
   }
 
-  void refresh(){
+  void refresh() {
     setState(() {});
   }
 }
