@@ -34,7 +34,6 @@ class ClientTravelMapController {
 
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
 
-
   BitmapDescriptor markerDriver;
   BitmapDescriptor fromMarker;
   BitmapDescriptor toMarker;
