@@ -27,12 +27,13 @@ class _DriverTravelCalificationPageState extends State<DriverTravelCalificationP
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _con.key,
       bottomNavigationBar: _buttonCalificate(),
       body: Column(
         children: [
           _bannerPriceInfo(),
-          _listTileTravelInfo('Desde', 'Cr falsa con calle Falsa', Icons.location_on),
-          _listTileTravelInfo('Hasta', 'Cr falsa con calle Falsa', Icons.directions_subway),
+          _listTileTravelInfo('Desde', _con.travelHistory?.from ?? '', Icons.location_on),
+          _listTileTravelInfo('Hasta', _con.travelHistory?.to ?? '', Icons.directions_subway),
           SizedBox(height: 30),
           _textCalificateYourDriver(),
           SizedBox(height: 15),
@@ -47,9 +48,10 @@ class _DriverTravelCalificationPageState extends State<DriverTravelCalificationP
       height: 50,
       margin: EdgeInsets.all(30),
       child: ButtonApp(
-        onPressed: () {},
+        onPressed: _con.calificate,
         text: 'CALIFICAR',
         color: Colors.amber,
+        textColor: Colors.black,
       ),
     );
   }
@@ -68,6 +70,7 @@ class _DriverTravelCalificationPageState extends State<DriverTravelCalificationP
           itemPadding: EdgeInsets.symmetric(horizontal: 4),
           unratedColor: Colors.grey[300],
           onRatingUpdate: (rating) {
+            _con.calification = rating;
             print('RATING: $rating');
           }
       ),
@@ -142,7 +145,7 @@ class _DriverTravelCalificationPageState extends State<DriverTravelCalificationP
               ),
               SizedBox(height: 5),
               Text(
-                '0\$',
+                '${_con.travelHistory?.price ?? '' }\$',
                 style: TextStyle(
                     fontSize: 25,
                     color: Colors.green,
@@ -157,8 +160,6 @@ class _DriverTravelCalificationPageState extends State<DriverTravelCalificationP
   }
 
   void refresh() {
-    setState(() {
-
-    });
+    setState(() {});
   }
 }
