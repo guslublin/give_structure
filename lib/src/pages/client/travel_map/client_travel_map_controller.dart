@@ -66,6 +66,7 @@ class ClientTravelMapController {
 
   bool isPickupTravel = false;
   bool isStartTravel = false;
+  bool isFinishTravel = false;
 
   StreamSubscription<DocumentSnapshot> _streamLocationController;
 
@@ -141,6 +142,7 @@ class ClientTravelMapController {
       else if (travelInfo.status == 'finished') {
         currentStatus = 'Viaje finalizado';
         colorStatus = Colors.cyan;
+        finishTravel();
       }
 
       refresh();
@@ -160,6 +162,13 @@ class ClientTravelMapController {
           plate: driver?.plate,
         )
     );
+  }
+
+  void finishTravel(){
+    if (!isFinishTravel){
+      isFinishTravel = true;
+      Navigator.pushNamedAndRemoveUntil(context, 'client/travel/calification', (route) => false, arguments: travelInfo.idTravelHistory);
+    }
   }
 
   void startTravel() {

@@ -208,12 +208,6 @@ class DriverTravelMapController {
 
     double total = await calculatePrice();
 
-    Map<String, dynamic> data = {
-      'status': 'finished'
-    };
-    await _travelInfoProvider.update(data, _idTravel);
-    travelInfo.status = 'finished';
-
     saveTravelHistory(total);
 
   }
@@ -229,6 +223,14 @@ class DriverTravelMapController {
     );
 
     String id = await _travelHistoryProvider.create(travelHistory);
+
+    Map<String, dynamic> data = {
+      'status': 'finished',
+      'idTravelHistory': id
+    };
+
+    await _travelInfoProvider.update(data, _idTravel);
+    travelInfo.status = 'finished';
 
     Navigator.pushNamedAndRemoveUntil(context, 'driver/travel/calification', (route) => false, arguments: id);
   }
